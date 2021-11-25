@@ -1,14 +1,11 @@
 # 1. PROGRAM METADATA ###################################
 
-# Calc_Cave_Depth3.0.py
-# Created by: Class 2021
-# Edited by: Jon Marlo Delicano 
-# For: Assignment 2 Deliverable 2
-# Date: November 24, 2021
-# Program function: Calculates the depth below the surface using radiolocation
-# Farrant, Andrew & Mullan, Graham. (2018). Novel use of radio-location for a ground investigation at Pen Park Hole, Bristol, United Kingdom
-# Uses the distance the receiver is from ground zero and angle of the receiver 
-# Assumes the angle of the receiver is in degrees and that the coordinates for Ground Zero and the Receiver's location is referencing a cartesian plane using metric(meter) units.
+# Horizontal Closed Traverse Survey Calculator
+# Created by: Justin Brassard, Bharat Bharat, Jon Marlo Delicano 
+# For: Project Implementation
+# Date: December 7, 2021
+# Program function: 
+# Assumes:
 # Inputs entered with keyboard
 # Outputs displayed on screen
 
