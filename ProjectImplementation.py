@@ -125,9 +125,18 @@ def ddtoDMS(dd):
 
     return bearing
 
+   # angle of misclosure
+   # perimiter
+   # Change in latiture
+# Change in departure
+# Error of closure
+# Precision Ratio
+
 # 3. MAIN FUNCTION ##################################
 
 # 3.0 PROGRAM STATEMENTS
+
+
 
 # 3.1 INPUT LOOP 
 
