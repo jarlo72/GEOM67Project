@@ -125,31 +125,90 @@ def ddtoDMS(dd):
 
     return bearing
 
-   # angle of misclosure
-   # perimiter
-   # Change in latiture
-# Change in departure
-# Error of closure
-# Precision Ratio
+
+# A function to define the angle of miscolsure using the sum of the angles and the sides stated
+
+def AOM(sides,sum_angles):
+
+        AOM = (sides - 2) * 180 - sum_angles
+
+        return AOM
+
+
+# A function to find the error of closure
+
+def EC (Total_Lat, Total_Dep):
+        EC = math.sqrt(Total_Lat**2 +Total_Dep**2)
+        return EC
+
+
+# A function to find the Percision Ratio
+
+def PR (EC,Perimeter):
+        PR = EC/Perimeter
+        return PR
+
+
 
 # 3. MAIN FUNCTION ##################################
 
 # 3.0 PROGRAM STATEMENTS
 
-
+print ("This program provides a proposed solution for Closed Traverse data processing, which serves to automate the calculation\n processes a surveyoror drafter would normally perform after the surveying" )
+print ("Insert assumptions and simplifications/Instructions for the user (Disclaimer)")
 
 # 3.1 INPUT LOOP 
+
+    Angles_IN =  []       	           # create empty list for receiver angles
+    Distances_IN = []                      # create empty list for distance to GZ
+
+    # Obtain angle and distance for multiple locations from the user
+    
+Count = 1
+
+    while True:
+        angle_degrees = float(input("\tEnter the angle of the reciever in degrees: "))
+        Angles_IN.append(angle_degrees)
+    # Ask the user for the Internal Angle of the current station they are evaluating
+        Internal_Angles = float(input("Please enter the internal angle for the current station: "))
+    # Ask the user for the Traverse lengths of the current station they are evaluating
+        Traverse_Lengths = float(input("Please enter the Traverse length for the current station: "))
+
+
+        Distance_GZ_CALC =round(CalculateDistance(GZ_X,GZ_Y,R_X,R_Y),1)
+        Distances_IN.append(Distance_GZ_CALC)
+
+        print()
+        end =str(input("Do you want to stop enetering values (Y/N)? "))
+        print()
+        if end.upper() == 'Y' :
+            break
+
+        Count = Count +1
 
 # 3.2 MAIN PROCESSING
 
 # i. Angle of Misclosure and Balancing -----------------
 
+
+# Function to Calculate the angle of misclosure
+
+Total_Actual = 
+
+Total_Theor = 
+
+
 # ii. Bearings and Azimuths ------------------ 
 
 # iii. Latitudes and Longitudes -----------------------
 
+# Change in latitude
+# Change in departure
+
 # iv. Draw traverse with Turtle graphics ------------------
 
 # v. Error of Closure and Precision Ratio --------------------
+
+# perimiter
 
 # 3.3  OUTPUT LOOP 
