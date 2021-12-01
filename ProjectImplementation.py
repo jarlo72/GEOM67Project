@@ -212,3 +212,29 @@ Total_Theor =
 # perimiter
 
 # 3.3  OUTPUT LOOP 
+
+    degree_sign= u'\N{DEGREE SIGN}' # for output degree symbol
+
+    # Display angles, distances, depths from lists in table format
+    fo = open("CalcDepth.csv", 'w', newline='')
+    fwriter = csv.writer(fo)
+    fwriter.writerow(["ID","GZ_X", "GZ_Y", "R_X", "R_Y","Angle_degrees", "DistanceToGZ_m", "CaveDepth_m"]) # Writing header into csv
+    idcount = 0
+    for index in range(len(calc_depths)): # index should be 0, 1, 2, ... to last index in lists
+        
+        idcount = idcount + 1 # unique identifier
+        # writing out inputs into csv
+        gzx_out = gzx_input[index] 
+        gzy_out = gzy_input[index]
+        rx_out = rx_input[index]
+        ry_out = ry_input[index]
+        input_ang_output = input_angles[index] 
+        
+        # writing out calculated values into csv
+        DistToGZ = round(input_distances[index],1) # round the input_dist output display to 1 decimal place
+        caveDepth = round(calc_depths[index],1)  # round the depth output to 1 decimal place
+
+        fwriter.writerow([idcount, gzx_out,gzy_out,rx_out,ry_out,input_ang_output,DistToGZ,caveDepth]) # Writing to csv         
+
+    fo.close()
+    print("Results successfully exported to csv file")
