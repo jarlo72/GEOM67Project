@@ -129,9 +129,7 @@ def ddtoDMS(dd):
 # A function to define the angle of miscolsure using the sum of the angles and the sides stated
 
 def AOM(sides,sum_angles):
-
         AOM = (sides - 2) * 180 - sum_angles
-
         return AOM
 
 
