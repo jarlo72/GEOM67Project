@@ -238,28 +238,23 @@ elif AoM == 0:
 
 # ii. Bearings and Azimuths, Latitudes, Departures ------------------ 
 
-Brng_list = [ref_bearing]
-azimuth = [ddref_bearing]
+Brng_list = [ref_bearing] # assigning the string DMS ref bearing from input to index 0
+azimuth_list = [ddref_bearing] # assigning the convert ref bearing to index 0
 Lat_list = []
 Dep_list = []
 total_lat = 0
 total_dep = 0
 
-for index in range(len(Bal_angle_list)):
-    intAngle = Bal_angle_list[index]
+for index in range(len(int_angles_list)):
+    intAngle = int_angles_list[index]
     if index == 0:
-        continue
-    elif index == 1:
-        BrngNext = azmcalc(dir_trav, ddref_bearing, intAngle)
-        azimuth.append(BrngNext)
-        BrngB4 = BrngNext
-
-    elif index > 1:
+        BrngNext=ddref_bearing
+    elif index >= 1:
         BrngNext = azmcalc(dir_trav, BrngB4, intAngle)
-        azimuth.append(BrngNext)
-        BrngB4 = BrngNext
-
-    Brng_list.append(ddtoDMS(BrngNext))
+        azimuth_list.append(BrngNext)
+        Brng_list.append(ddtoDMS(BrngNext))
+    
+    BrngB4 = BrngNext
 
     Latitude=LatCalc(BrngNext, trav_len_list[index])
     total_lat = total_lat + Latitude
@@ -274,7 +269,6 @@ for index in range(len(Bal_angle_list)):
 ErrorOfClosure = EoC(total_lat, total_dep)
 PrecisionRatio = PR(ErrorOfClosure, )
 
-
 # 3.3  OUTPUT LOOP 
 
 degree_sign= u'\N{DEGREE SIGN}' # for output degree symbol
@@ -282,24 +276,41 @@ degree_sign= u'\N{DEGREE SIGN}' # for output degree symbol
 # Display angles, distances, depths from lists in table format
 fo = open("CalcDepth.csv", 'w', newline='')
 fwriter = csv.writer(fo)
-fwriter.writerow(["Station Number","Traverse Lengths", "Bearings", "Azimuths","Latitudes","Departures","Angular Miscolsure","Perimeter", "Change in Latitude", "Change in Departure", "Error Of Closure", "Precision Ratio"]) # Writing header into csv
+fwriter.writerow(["Traverse","Traverse Lengths", "Original Angles", "Balanced Angles","Bearings", "Azimuths","Latitudes","Departures","Angular Miscolsure","Total Latitude", "Total Departure","Perimeter", "Error Of Closure", "Precision Ratio"]) # Writing header into csv
 idcount = 0
-for index in range(len(calc_depths)): # index should be 0, 1, 2, ... to last index in lists
+for index in range(len(trav_len_list)): # index should be 0, 1, 2, ... to last index in lists
     
-    idcount = idcount + 1 # unique identifier
+    
     # writing out inputs into csv
-    Station_out = gzx_input[index] 
-    Traverse_out = gzy_input[index]
-    Bearings_out = rx_input[index]
-    Azimuths_out = ry_input[index]
-    Latitudes_out = input_angles[index] 
-    Departures_out = gzx_input[index] 
-    AOM_out = gzy_input[index]
-    Perimeter_out = rx_input[index]
-    CIL_out = ry_input[index]
-    CID_out = input_angles[index] 
-    EOC_out = input_angles[index]     
-    PR_out = input_angles[index] 
+
+    idcount = 1
+
+    if index == len(trav_len_list)-1:
+        UniqueId = str(idcount)+"-1"
+    else:
+        UniqueId = str(idcount)+"-"+str(idcount+1)
+
+    idcount = idcount + 1
+
+    TraverseLine = [index] 
+    Traverse_out = trav_len_list[index]
+
+    OriginalAngles = int_angles_list[index]
+    NewAngles = Bal_angle_list[index]
+
+    Bearings_out = Brng_list[index]
+    Azimuths_out = azimuth_list[index]
+
+    Latitudes_out = Lat_list[index] 
+    Departures_out = Dep_list[index] 
+    
+
+    # AOM_out 
+    #total_dep
+    #total_lat
+    # Perimeter
+    # EOC  
+    # PR
     
     # writing out calculated values into csv
     DistToGZ = round(input_distances[index],1) # round the input_dist output display to 1 decimal place
@@ -309,4 +320,3 @@ for index in range(len(calc_depths)): # index should be 0, 1, 2, ... to last ind
 
 fo.close()
 print("Results successfully exported to csv file")
-
