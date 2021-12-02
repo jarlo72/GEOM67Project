@@ -102,25 +102,25 @@ def ddtoDMS(dd):
     if dd >= 0 and dd < 90:
         min,sec_ = divmod(dd*3600,60)
         deg,min = divmod(min, 60)
-        sec = round(sec_,0)
+        sec = round(sec_,00)
         bearing = "N"+str(int(deg))+"d"+str(int(min))+"'"+str(int(sec))+"\""+"E"
 
     elif dd >= 90 and dd < 180:
         min,sec_ = divmod((180-dd)*3600,60)
         deg,min = divmod(min, 60)
-        sec = round(sec_,0)
+        sec = round(sec_,00)
         bearing = "S"+str(int(deg))+"d"+str(int(min))+"'"+str(int(sec))+"\""+"E"
 
     elif dd >= 180 and dd < 270:
         min,sec_ = divmod((dd-180)*3600,60)
         deg,min = divmod(min, 60)
-        sec = round(sec_,0)
+        sec = round(sec_,00)
         bearing = "S"+str(int(deg))+"d"+str(int(min))+"'"+str(int(sec))+"\""+"W"
 
     elif dd >= 270 and dd < 360:
         min,sec_ = divmod((360-dd)*3600,60)
         deg,min = divmod(min, 60)
-        sec = round(sec_,0)
+        sec = round(sec_,00)
         bearing = "N"+str(int(deg))+"d"+str(int(min))+"'"+str(int(sec))+"\""+"W"
 
     return bearing
@@ -147,7 +147,7 @@ def PR(EoC,Perimeter):
 def ddtoDMSAoM(dd):
     min,sec_ = divmod(dd*3600,60)
     deg,min = divmod(min, 60)
-    sec = round(sec_,0)
+    sec = round(sec_,00)
     bearing = str(int(deg))+"d"+str(int(min))+"'"+str(int(sec))+"\""
     return bearing
 
@@ -165,6 +165,7 @@ trav_len_list = []   # create empty list for traverse lengths
 
 # Non Looping inputs
 degformat = input("Are your internal angles in DMS or decimal degrees format? Please Enter 'DMS' or 'DD': ")
+unit_pref = input("Specify the units for your traverse lengths? Please enter 'ft' or 'm': ")
 outpt_prec = int(input("How precise do you want your non-angular outputs to be? Enter number of digits after decimal point: "))   
 ref_bearing = input("What is your reference bearing from station 1 to 2? Enter format as [N00d00'00\"W]: ")
 dir_trav = input("What is the direction of your traverse? Enter 'CC' for counterclockwise or 'C' for clockwise: ")
@@ -204,13 +205,8 @@ while True: # Input loop for internal angles and traverse lengths, with some pre
     trav_len_list.append(Traverse_Lengths) # appends traverse length into format into list
     perimeter = perimeter + Traverse_Lengths # running total for perimeter
 
-    print()
-    end =str(input("Do you want to stop entering values (Y/N)? "))
-    print()
-    if end.upper() == 'Y' :
-        break
 
-    #Right eye with starting point of upper right of face
+    #Turtle drawing lines
     if StationCount == 1:
         bharat.left(90-ddref_bearing)
     elif dir_trav == "CC":
@@ -218,6 +214,12 @@ while True: # Input loop for internal angles and traverse lengths, with some pre
     elif dir_trav == "C":
         bharat.left(-1*(180-int_angle))
     bharat.forward(Traverse_Lengths)
+
+    print()
+    end =str(input("Do you want to stop entering values (Y/N)? "))
+    print()
+    if end.upper() == 'Y' :
+        break
 
     StationCount = StationCount + 1
 
@@ -231,7 +233,7 @@ AngleOfMisc = AoM(StationCount, SumOfAngles)
 Bal_angle_list = []
 
 if AngleOfMisc != 0:
-    balance_Val = AngleOfMisc/StationCount
+    balance_Val = (AngleOfMisc/StationCount)
     for index in range(len(int_angles_list)):
         if AngleOfMisc > 0:
             Balanced_int_angle = int_angles_list[index] - balance_Val
@@ -275,35 +277,34 @@ for index in range(len(int_angles_list)):
 # iii. Error of Closure and Precision Ratio -------------------- 
 #    
 ErrorOfClosure = EoC(total_lat, total_dep)
-PrecisionRatio = PR(ErrorOfClosure, )
+PrecisionRatio = PR(ErrorOfClosure, perimeter)
 
 # 3.3  OUTPUT LOOP 
 
 # Display angles, distances, depths from lists in table format
 fo = open("Closed_Traverse_Survey.csv", 'w', newline='')
 fwriter = csv.writer(fo)
-fwriter.writerow(["Traverse","Traverse Lengths", "Original Angles", "Balanced Angles","Bearings", "Azimuths","Latitudes","Departures","Angular Miscolsure","Total Latitude", "Total Departure","Perimeter", "Error Of Closure", "Precision Ratio"]) # Writing header into csv
+fwriter.writerow(["Traverse","Traverse Lengths ("+unit_pref+")", "Original Angles", "Balanced Angles","Bearings", "Azimuths","Latitudes ("+unit_pref+")","Departures ("+unit_pref+")","Angular Miscolsure","Total Latitude ("+unit_pref+")", "Total Departure ("+unit_pref+")","Perimeter ("+unit_pref+")", "Error Of Closure", "Precision Ratio"]) # Writing header into csv
+idcount = 1
 
 for index in range(len(trav_len_list)): # index should be 0, 1, 2, ... to last index in lists
     
     # writing out inputs into csv
 
-    idcount = 1
-
     if index == len(trav_len_list)-1:
-        TraverseLine = str(idcount)+"-1"
+        TraverseLine = str(idcount)+" to 1"
     else:
-        TraverseLine = str(idcount)+"-"+str(idcount+1)
+        TraverseLine = str(idcount)+" to "+str(idcount+1)
 
     idcount = idcount + 1
 
     Traverse_out = trav_len_list[index]
 
-    OriginalAngles = int_angles_list[index]
-    NewAngles = Bal_angle_list[index]
+    OriginalAngles = ddtoDMSAoM(int_angles_list[index])
+    NewAngles = ddtoDMSAoM(Bal_angle_list[index])
 
     Bearings_out = Brng_list[index]
-    Azimuths_out = azimuth_list[index]
+    Azimuths_out = ddtoDMSAoM(azimuth_list[index])
 
     Latitudes_out = Lat_list[index] 
     Departures_out = Dep_list[index] 
@@ -314,7 +315,7 @@ for index in range(len(trav_len_list)): # index should be 0, 1, 2, ... to last i
         total_lat = round(total_lat,outpt_prec)
         Perimeter = round(perimeter, outpt_prec)
         ErroC = round(ErrorOfClosure, outpt_prec) 
-        PeR = round(PrecisionRatio, outpt_prec)
+        PeR = (PrecisionRatio)
         fwriter.writerow([TraverseLine, Traverse_out, OriginalAngles, NewAngles, Bearings_out, Azimuths_out, Latitudes_out, Departures_out, AOM_out, total_dep, total_lat, Perimeter,ErroC, PeR]) 
     else:
         fwriter.writerow([TraverseLine, Traverse_out, OriginalAngles, NewAngles, Bearings_out, Azimuths_out, Latitudes_out, Departures_out])       
