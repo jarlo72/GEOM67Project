@@ -282,17 +282,24 @@ degree_sign= u'\N{DEGREE SIGN}' # for output degree symbol
 # Display angles, distances, depths from lists in table format
 fo = open("CalcDepth.csv", 'w', newline='')
 fwriter = csv.writer(fo)
-fwriter.writerow(["ID","GZ_X", "GZ_Y", "R_X", "R_Y","Angle_degrees", "DistanceToGZ_m", "CaveDepth_m"]) # Writing header into csv
+fwriter.writerow(["Station Number","Traverse Lengths", "Bearings", "Azimuths","Latitudes","Departures","Angular Miscolsure","Perimeter", "Change in Latitude", "Change in Departure", "Error Of Closure", "Precision Ratio"]) # Writing header into csv
 idcount = 0
 for index in range(len(calc_depths)): # index should be 0, 1, 2, ... to last index in lists
     
     idcount = idcount + 1 # unique identifier
     # writing out inputs into csv
-    gzx_out = gzx_input[index] 
-    gzy_out = gzy_input[index]
-    rx_out = rx_input[index]
-    ry_out = ry_input[index]
-    input_ang_output = input_angles[index] 
+    Station_out = gzx_input[index] 
+    Traverse_out = gzy_input[index]
+    Bearings_out = rx_input[index]
+    Azimuths_out = ry_input[index]
+    Latitudes_out = input_angles[index] 
+    Departures_out = gzx_input[index] 
+    AOM_out = gzy_input[index]
+    Perimeter_out = rx_input[index]
+    CIL_out = ry_input[index]
+    CID_out = input_angles[index] 
+    EOC_out = input_angles[index]     
+    PR_out = input_angles[index] 
     
     # writing out calculated values into csv
     DistToGZ = round(input_distances[index],1) # round the input_dist output display to 1 decimal place
@@ -302,3 +309,4 @@ for index in range(len(calc_depths)): # index should be 0, 1, 2, ... to last ind
 
 fo.close()
 print("Results successfully exported to csv file")
+
