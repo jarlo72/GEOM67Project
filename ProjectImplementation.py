@@ -11,11 +11,11 @@
 
 # Structure of implementation follows the algorithm
 
-# 2. FUNCTION DEFINITIONS AND IMPORTS ##################################
+# 2. FUNCTION DEFINITIONS AND IMPORTS #################################################
 
-import math
+import math # importing math for trig and relevant math functions
 
-# Function to convert String Reference Bearing in DMS to azimuth in decimal degrees.
+# 1) Function to convert String Reference Bearing in DMS to azimuth in decimal degrees.
 
 dms="N78d18'59\"W" # needs to except this format only. 11 characters in length (ie. index 0 - 10).
 
@@ -49,7 +49,7 @@ def RefBToAzmDD(bearingStr):
 
     return AZMdd
 
-# DMStoDD function, for internal angles if specified input format is DMS
+# 2) DMStoDD function, for internal angles if specified input format is DMS
 
 dms="78d18'59\"" # needs to except this format only. 9 characters in length (ie index 0 - 8)
 
@@ -64,7 +64,7 @@ def DMStoDD(DMSangle):
 
 print(DMStoDD(dms))
 
-# Azimuth Finder function, returns azimuth in decimal degrees
+# 3) Azimuth Bearing Finder Function, returns azimuth in decimal degrees
 
 def azmcalc(CalcDir, BearingBefore, intAngle):
 
@@ -81,21 +81,21 @@ def azmcalc(CalcDir, BearingBefore, intAngle):
 
     return BearingNext
 
-# Latitude function
+# 4) Latitude function
 
 def LatCalc(azmth, travL):
     azmth_rad = math.radians(azmth)
     changeLat=math.cos(azmth_rad)*travL
     return changeLat
 
-# Departure function
+# 5) Departure function
 
 def LatCalc(azmth, travL):
     azmth_rad = math.radians(azmth)
     changeDep=math.sin(azmth_rad)*travL
     return changeDep
 
-# Function to convert Azimuth in decimal degrees to Bearing in DMS; returns string in DMS format
+# 6) Function to convert Azimuth in decimal degrees to Bearing in DMS; returns string in DMS format
 
 def ddtoDMS(dd):
 
@@ -126,29 +126,25 @@ def ddtoDMS(dd):
     return bearing
 
 
-# A function to define the angle of miscolsure using the sum of the angles and the sides stated
+# 7) function to define the angle of miscolsure using the sum of the angles and the sides stated
 
-def AOM(sides,sum_angles):
-        AOM = (sides - 2) * 180 - sum_angles
-        return AOM
+def AoM(sides,sum_angles):
+        AngMisc = (sides - 2) * 180 - sum_angles
+        return AngMisc
 
+# 8) function to find the error of closure
 
-# A function to find the error of closure
+def EoC(Total_Lat, Total_Dep):
+        ErrClosr = math.sqrt(Total_Lat**2 +Total_Dep**2)
+        return ErrClosr
 
-def EC (Total_Lat, Total_Dep):
-        EC = math.sqrt(Total_Lat**2 +Total_Dep**2)
-        return EC
+# 9) function to find the Precision Ratio
 
+def PR(EoC,Perimeter):
+        PRatio = EoC/Perimeter
+        return PRatio
 
-# A function to find the Percision Ratio
-
-def PR (EC,Perimeter):
-        PR = EC/Perimeter
-        return PR
-
-
-
-# 3. MAIN FUNCTION ##################################
+# 3. MAIN FUNCTION ####################################################################
 
 # 3.0 PROGRAM STATEMENTS
 
@@ -157,34 +153,34 @@ print ("Insert assumptions and simplifications/Instructions for the user (Discla
 
 # 3.1 INPUT LOOP 
 
-    Angles_IN =  []       	           # create empty list for receiver angles
-    Distances_IN = []                      # create empty list for distance to GZ
+Angles_IN =  []       	           # create empty list for receiver angles
+Distances_IN = []                      # create empty list for distance to GZ
 
     # Obtain angle and distance for multiple locations from the user
     
 Count = 1
 
-    while True:
-        angle_degrees = float(input("\tEnter the angle of the reciever in degrees: "))
-        Angles_IN.append(angle_degrees)
+while True:
+    angle_degrees = float(input("\tEnter the angle of the reciever in degrees: "))
+    Angles_IN.append(angle_degrees)
     # Ask the user for the Internal Angle of the current station they are evaluating
-        Internal_Angles = float(input("Please enter the internal angle for the current station: "))
+    Internal_Angles = float(input("Please enter the internal angle for the current station: "))
     # Ask the user for the Traverse lengths of the current station they are evaluating
-        Traverse_Lengths = float(input("Please enter the Traverse length for the current station: "))
+    Traverse_Lengths = float(input("Please enter the Traverse length for the current station: "))
 
 
-        Distance_GZ_CALC =round(CalculateDistance(GZ_X,GZ_Y,R_X,R_Y),1)
-        Distances_IN.append(Distance_GZ_CALC)
+    Distance_GZ_CALC =round(CalculateDistance(GZ_X,GZ_Y,R_X,R_Y),1)
+    Distances_IN.append(Distance_GZ_CALC)
 
-        print()
-        end =str(input("Do you want to stop enetering values (Y/N)? "))
-        print()
-        if end.upper() == 'Y' :
-            break
+    print()
+    end =str(input("Do you want to stop enetering values (Y/N)? "))
+    print()
+    if end.upper() == 'Y' :
+        break
 
-        Count = Count +1
+    Count = Count +1
 
-# 3.2 MAIN PROCESSING
+# 3.2 MAIN PROCESSING LOOPS
 
 # i. Angle of Misclosure and Balancing -----------------
 
