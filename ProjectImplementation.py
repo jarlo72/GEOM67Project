@@ -56,9 +56,9 @@ dms="78d18'59\"" # needs to except this format only. 9 characters in length (ie 
 
 def DMStoDD(DMSangle):
 
-    num1=float(DMSangle[0:2]) # extracts degrees
-    num2=float(DMSangle[3:5]) # extracts minutes
-    num3=float(DMSangle[6:8]) # extracts seconds
+    num1=float(DMSangle[0:3]) # extracts degrees
+    num2=float(DMSangle[4:6]) # extracts minutes
+    num3=float(DMSangle[7:9]) # extracts seconds
     dd=(num1+(num2+(num3/60))/60)
 
     return dd
@@ -150,7 +150,7 @@ def PR(EoC,Perimeter):
 print ("This program provides a proposed solution for Closed Traverse data processing, which serves to automate the calculation\n processes a surveyoror drafter would normally perform after the surveying" )
 print ("Insert assumptions and simplifications/Instructions for the user (Disclaimer)")
 
-# 3.1 INPUT LOOP ------------------------------------------------------------
+# 3.1 INPUT LOOP AND PRE-PROCESSING ------------------------------------------------------------
 
 int_angles_list =  []  # create empty list for internal angles
 trav_len_list = []   # create empty list for traverse lengths
@@ -161,12 +161,12 @@ outpt_prec = int(input("How precise do you want your non-angular outputs to be? 
 ref_bearing = input("What is your reference bearing from station 1 to 2? Enter format as [N00d00'00\"W]: ")
 dir_trav = input("What is the direction of your traverse? Enter 'CC' for counterclockwise or 'C' for clockwise: ")
 
-#initiating screen with white background for emoji contrast
+#initiating screen for turtle to draw survey diagram
 wn=turtle.Screen()
+wn.bgcolor("white")
 height = 5000
 width = 5000
 turtle.screensize(width, height)
-wn.bgcolor("white")
 bharat=turtle.Turtle()
 bharat.color("black")
 bharat.pensize(5)
@@ -213,7 +213,7 @@ while True: # Input loop for internal angles and traverse lengths, with some pre
 
     StationCount = StationCount + 1
 
-wn.exitonclick() #exit program
+wn.exitonclick() #exit turtle program
 
 # 3.2 MAIN PROCESSING LOOPS -----------------------------------------------------------
 
