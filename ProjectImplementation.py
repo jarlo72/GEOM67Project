@@ -280,10 +280,9 @@ PrecisionRatio = PR(ErrorOfClosure, )
 # 3.3  OUTPUT LOOP 
 
 # Display angles, distances, depths from lists in table format
-fo = open("CalcDepth.csv", 'w', newline='')
+fo = open("Closed_Traverse_Survey.csv", 'w', newline='')
 fwriter = csv.writer(fo)
 fwriter.writerow(["Traverse","Traverse Lengths", "Original Angles", "Balanced Angles","Bearings", "Azimuths","Latitudes","Departures","Angular Miscolsure","Total Latitude", "Total Departure","Perimeter", "Error Of Closure", "Precision Ratio"]) # Writing header into csv
-idcount = 0
 
 for index in range(len(trav_len_list)): # index should be 0, 1, 2, ... to last index in lists
     
@@ -308,15 +307,19 @@ for index in range(len(trav_len_list)): # index should be 0, 1, 2, ... to last i
 
     Latitudes_out = Lat_list[index] 
     Departures_out = Dep_list[index] 
+
+    if index == 0:
+        AOM_out = ddtoDMSAoM(AngleOfMisc)
+        total_dep = round(total_dep,outpt_prec)
+        total_lat = round(total_lat,outpt_prec)
+        Perimeter = round(perimeter, outpt_prec)
+        ErroC = round(ErrorOfClosure, outpt_prec) 
+        PeR = round(PrecisionRatio, outpt_prec)
+
     
-    AOM_out = ddtoDMSAoM(AngleOfMisc)
-    total_dep = round(total_dep,outpt_prec)
-    total_lat = round(total_lat,outpt_prec)
-    Perimeter = round(perimeter, outpt_prec)
-    EoC = round(ErrorOfClosure, outpt_prec) 
-    PR = round(PrecisionRatio, outpt_prec)
     
-    fwriter.writerow([idcount, gzx_out,gzy_out,rx_out,ry_out,input_ang_output,DistToGZ,caveDepth]) # Writing to csv         
+    
+    fwriter.writerow([TraverseLine, Traverse_out, OriginalAngles, NewAngles, Bearings_out, Azimuths_out, Latitudes_out, Departures_out, AOM_out, total_dep, total_lat, Perimeter,ErroC, PeR]) # Writing to csv         
 
 fo.close()
 print("Results successfully exported to csv file")
