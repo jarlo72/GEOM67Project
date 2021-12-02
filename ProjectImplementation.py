@@ -89,7 +89,7 @@ def LatCalc(azmth, travL):
 
 # 5) Departure function
 
-def LatCalc(azmth, travL):
+def DepCalc(azmth, travL):
     azmth_rad = math.radians(azmth)
     changeDep=math.sin(azmth_rad)*travL
     return changeDep
@@ -236,34 +236,43 @@ elif AoM == 0:
         Balanced_int_angle = int_angles_list[index]
         Bal_angle_list.append(Balanced_int_angle)
 
-# ii. Bearings and Azimuths ------------------ 
+# ii. Bearings and Azimuths, Latitudes, Departures ------------------ 
 
-Brng_list = []
+Brng_list = [ref_bearing]
 azimuth = [ddref_bearing]
+Lat_list = []
+Dep_list = []
+total_lat = 0
+total_dep = 0
 
 for index in range(len(Bal_angle_list)):
     intAngle = Bal_angle_list[index]
     if index == 0:
         continue
-    if index == 1:
+    elif index == 1:
         BrngNext = azmcalc(dir_trav, ddref_bearing, intAngle)
         azimuth.append(BrngNext)
         BrngB4 = BrngNext
-    elif index > 2:
+
+    elif index > 1:
         BrngNext = azmcalc(dir_trav, BrngB4, intAngle)
         azimuth.append(BrngNext)
         BrngB4 = BrngNext
-    Brng_list.append(ddtoDMS(BrngB4))
-    
 
+    Brng_list.append(ddtoDMS(BrngNext))
 
-# iii. Latitudes and Longitudes -----------------------
+    Latitude=LatCalc(BrngNext, trav_len_list[index])
+    total_lat = total_lat + Latitude
+    Lat_list.append(Latitude)
 
-# Change in latitude
-# Change in departure
+    Departure = DepCalc(BrngNext, trav_len_list[index])
+    total_dep = total_dep + Departure
+    Dep_list.append(Departure)
 
-
-# v. Error of Closure and Precision Ratio --------------------
+# iii. Error of Closure and Precision Ratio -------------------- 
+#    
+ErrorOfClosure = EoC(total_lat, total_dep)
+PrecisionRatio = PR(ErrorOfClosure, )
 
 
 # 3.3  OUTPUT LOOP 
