@@ -14,6 +14,7 @@
 # 2. FUNCTION DEFINITIONS AND IMPORTS #################################################
 
 import math # importing math for trig and relevant math functions
+import turtle
 
 # 1) Function to convert String Reference Bearing in DMS to azimuth in decimal degrees.
 
@@ -24,7 +25,7 @@ def RefBToAzmDD(bearingStr):
     if bearingStr[0].upper()=="N":
             VertDir = "N"
     elif bearingStr[0].upper()=="S":
-            VertDir = "N"
+            VertDir = "S"
 
     if bearingStr[-1].upper()=="W":
             HorDir = "W"
@@ -127,20 +128,20 @@ def ddtoDMS(dd):
 # 7) function to define the angle of miscolsure using the sum of the angles and the sides stated
 
 def AoM(sides,sum_angles):
-        AngMisc = (sides - 2) * 180 - sum_angles
-        return AngMisc
+    AngMisc = (sides - 2) * 180 - sum_angles
+    return AngMisc
 
 # 8) function to find the error of closure
 
 def EoC(Total_Lat, Total_Dep):
-        ErrClosr = math.sqrt(Total_Lat**2 +Total_Dep**2)
-        return ErrClosr
+    ErrClosr = math.sqrt(Total_Lat**2 +Total_Dep**2)
+    return ErrClosr
 
 # 9) function to find the Precision Ratio
 
 def PR(EoC,Perimeter):
-        PRatio = EoC/Perimeter
-        return PRatio
+    PRatio = EoC/Perimeter
+    return PRatio
 
 # 3. MAIN FUNCTION ####################################################################
 
@@ -157,24 +158,38 @@ trav_len_list = []   # create empty list for traverse lengths
 # Non Looping inputs
 degformat = input("Are your internal angles in DMS or decimal degrees format? Please Enter 'DMS' or 'DD': ")
 outpt_prec = int(input("How precise do you want your non-angular outputs to be? Enter number of digits after decimal point: "))   
-ref_bearing = input("What is your reference bearing from station 1 to 2? Enter format as [N00d00'00\"]: ")
+ref_bearing = input("What is your reference bearing from station 1 to 2? Enter format as [N00d00'00\"W]: ")
 dir_trav = input("What is the direction of your traverse? Enter 'CC' for counterclockwise or 'C' for clockwise: ")
+
+#initiating screen with white background for emoji contrast
+wn=turtle.Screen()
+height = 5000
+width = 5000
+turtle.screensize(width, height)
+wn.bgcolor("white")
+bharat=turtle.Turtle()
+bharat.color("black")
+bharat.pensize(5)
 
 # Pre-processing inputs for main processing loop
 ddref_bearing=RefBToAzmDD(ref_bearing) # Calls conversion function to turn reference bearing string w/ directions into decimal degree azimuth
 
+# variable declarations for running totals / increments
 StationCount = 1
 perimeter = 0
+SumOfAngles = 0
 
 while True: # Input loop for internal angles and traverse lengths, with some pre-processing calculations
 
     # Ask the user for the Internal Angle of the current station they are evaluating
-    Internal_Angles = input("Please enter the internal angle for observed at station "+str(StationCount)+": ")
     if degformat.upper() == "DMS":
+        Internal_Angles = input("Please enter the internal angle for observed at station "+str(StationCount)+" in DMS format [000d00'00\"]")
         int_angle=DMStoDD(Internal_Angles) # converts dms internal angle into dd before appending
     else:
+        Internal_Angles = input("Please enter the internal angle for observed at station "+str(StationCount)+" in decimal degrees: ")
         int_angle=float(Internal_Angles) # converts to float
     int_angles_list.append(int_angle) # appends internal angles in dd format into list
+    SumOfAngles = SumOfAngles + int_angle
 
     # Ask the user for the Traverse lengths of the current station they are evaluating
     Traverse_Lengths = float(input("Please enter the length for Traverse going from station "+str(StationCount)+" to "+str(StationCount+1)+": "))
@@ -182,27 +197,44 @@ while True: # Input loop for internal angles and traverse lengths, with some pre
     perimeter = perimeter + Traverse_Lengths # running total for perimeter
 
     print()
-    end =str(input("Do you want to stop enetering values (Y/N)? "))
+    end =str(input("Do you want to stop entering values (Y/N)? "))
     print()
     if end.upper() == 'Y' :
         break
 
+    #Right eye with starting point of upper right of face
+    if StationCount == 1:
+        bharat.left(90-ddref_bearing)
+    elif dir_trav == "CC":
+        bharat.left(180-int_angle)
+    elif dir_trav == "C":
+        bharat.left(-1*(180-int_angle))
+    bharat.forward(Traverse_Lengths)
+
     StationCount = StationCount + 1
+
+wn.exitonclick() #exit program
 
 # 3.2 MAIN PROCESSING LOOPS -----------------------------------------------------------
 
-# i. Internal Angle conversion
-
 # i. Angle of Misclosure and Balancing -----------------
 
-AoM(StationCount, )
+AoM(StationCount, SumOfAngles)
+Bal_angle_list = []
 
-# Function to Calculate the angle of misclosure
-
-Total_Actual = 
-
-Total_Theor = 
-
+if AoM != 0:
+    balance_Val = AoM/StationCount
+    for index in range(len(int_angles_list)):
+        if AoM > 0:
+            Balanced_int_angle = int_angles_list[index] - balance_Val
+            Bal_angle_list.append(Balanced_int_angle)
+        elif AoM < 0:
+            Balanced_int_angle = int_angles_list[index] + balance_Val
+            Bal_angle_list.append(Balanced_int_angle)
+elif AoM == 0:
+    for index in range(len(int_angles_list)):
+        Balanced_int_angle = int_angles_list[index]
+        Bal_angle_list.append(Balanced_int_angle)
 
 # ii. Bearings and Azimuths ------------------ 
 
@@ -211,11 +243,9 @@ Total_Theor =
 # Change in latitude
 # Change in departure
 
-# iv. Draw traverse with Turtle graphics ------------------
 
 # v. Error of Closure and Precision Ratio --------------------
 
-# perimiter
 
 # 3.3  OUTPUT LOOP 
 
