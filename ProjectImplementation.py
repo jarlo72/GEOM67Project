@@ -15,6 +15,7 @@
 
 import math # importing math for trig and relevant math functions
 import turtle
+import csv
 
 # 1) Function to convert String Reference Bearing in DMS to azimuth in decimal degrees.
 
@@ -124,7 +125,6 @@ def ddtoDMS(dd):
 
     return bearing
 
-
 # 7) function to define the angle of miscolsure using the sum of the angles and the sides stated
 
 def AoM(sides,sum_angles):
@@ -142,6 +142,14 @@ def EoC(Total_Lat, Total_Dep):
 def PR(EoC,Perimeter):
     PRatio = EoC/Perimeter
     return PRatio
+
+# 10) Converts DD to DMS for any angle which doesn't require directions
+def ddtoDMSAoM(dd):
+    min,sec_ = divmod(dd*3600,60)
+    deg,min = divmod(min, 60)
+    sec = round(sec_,0)
+    bearing = str(int(deg))+"d"+str(int(min))+"'"+str(int(sec))+"\""
+    return bearing
 
 # 3. MAIN FUNCTION ####################################################################
 
@@ -219,19 +227,19 @@ wn.exitonclick() #exit turtle program
 
 # i. Angle of Misclosure and Balancing -----------------
 
-AoM(StationCount, SumOfAngles)
+AngleOfMisc = AoM(StationCount, SumOfAngles)
 Bal_angle_list = []
 
-if AoM != 0:
-    balance_Val = AoM/StationCount
+if AngleOfMisc != 0:
+    balance_Val = AngleOfMisc/StationCount
     for index in range(len(int_angles_list)):
-        if AoM > 0:
+        if AngleOfMisc > 0:
             Balanced_int_angle = int_angles_list[index] - balance_Val
             Bal_angle_list.append(Balanced_int_angle)
-        elif AoM < 0:
+        elif AngleOfMisc < 0:
             Balanced_int_angle = int_angles_list[index] + balance_Val
             Bal_angle_list.append(Balanced_int_angle)
-elif AoM == 0:
+elif AngleOfMisc== 0:
     for index in range(len(int_angles_list)):
         Balanced_int_angle = int_angles_list[index]
         Bal_angle_list.append(Balanced_int_angle)
@@ -271,28 +279,25 @@ PrecisionRatio = PR(ErrorOfClosure, )
 
 # 3.3  OUTPUT LOOP 
 
-degree_sign= u'\N{DEGREE SIGN}' # for output degree symbol
-
 # Display angles, distances, depths from lists in table format
 fo = open("CalcDepth.csv", 'w', newline='')
 fwriter = csv.writer(fo)
 fwriter.writerow(["Traverse","Traverse Lengths", "Original Angles", "Balanced Angles","Bearings", "Azimuths","Latitudes","Departures","Angular Miscolsure","Total Latitude", "Total Departure","Perimeter", "Error Of Closure", "Precision Ratio"]) # Writing header into csv
 idcount = 0
+
 for index in range(len(trav_len_list)): # index should be 0, 1, 2, ... to last index in lists
-    
     
     # writing out inputs into csv
 
     idcount = 1
 
     if index == len(trav_len_list)-1:
-        UniqueId = str(idcount)+"-1"
+        TraverseLine = str(idcount)+"-1"
     else:
-        UniqueId = str(idcount)+"-"+str(idcount+1)
+        TraverseLine = str(idcount)+"-"+str(idcount+1)
 
     idcount = idcount + 1
 
-    TraverseLine = [index] 
     Traverse_out = trav_len_list[index]
 
     OriginalAngles = int_angles_list[index]
@@ -304,18 +309,13 @@ for index in range(len(trav_len_list)): # index should be 0, 1, 2, ... to last i
     Latitudes_out = Lat_list[index] 
     Departures_out = Dep_list[index] 
     
-
-    # AOM_out 
-    #total_dep
-    #total_lat
-    # Perimeter
-    # EOC  
-    # PR
+    AOM_out = ddtoDMSAoM(AngleOfMisc)
+    total_dep = round(total_dep,outpt_prec)
+    total_lat = round(total_lat,outpt_prec)
+    Perimeter = round(perimeter, outpt_prec)
+    EoC = round(ErrorOfClosure, outpt_prec) 
+    PR = round(PrecisionRatio, outpt_prec)
     
-    # writing out calculated values into csv
-    DistToGZ = round(input_distances[index],1) # round the input_dist output display to 1 decimal place
-    caveDepth = round(calc_depths[index],1)  # round the depth output to 1 decimal place
-
     fwriter.writerow([idcount, gzx_out,gzy_out,rx_out,ry_out,input_ang_output,DistToGZ,caveDepth]) # Writing to csv         
 
 fo.close()
