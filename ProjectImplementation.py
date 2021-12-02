@@ -238,6 +238,25 @@ elif AoM == 0:
 
 # ii. Bearings and Azimuths ------------------ 
 
+Brng_list = []
+azimuth = [ddref_bearing]
+
+for index in range(len(Bal_angle_list)):
+    intAngle = Bal_angle_list[index]
+    if index == 0:
+        continue
+    if index == 1:
+        BrngNext = azmcalc(dir_trav, ddref_bearing, intAngle)
+        azimuth.append(BrngNext)
+        BrngB4 = BrngNext
+    elif index > 2:
+        BrngNext = azmcalc(dir_trav, BrngB4, intAngle)
+        azimuth.append(BrngNext)
+        BrngB4 = BrngNext
+    Brng_list.append(ddtoDMS(BrngB4))
+    
+
+
 # iii. Latitudes and Longitudes -----------------------
 
 # Change in latitude
