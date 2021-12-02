@@ -205,7 +205,6 @@ while True: # Input loop for internal angles and traverse lengths, with some pre
     trav_len_list.append(Traverse_Lengths) # appends traverse length into format into list
     perimeter = perimeter + Traverse_Lengths # running total for perimeter
 
-
     #Turtle drawing lines
     if StationCount == 1:
         bharat.left(90-ddref_bearing)
@@ -316,7 +315,7 @@ for index in range(len(trav_len_list)): # index should be 0, 1, 2, ... to last i
         Perimeter = round(perimeter, outpt_prec)
         ErroC = round(ErrorOfClosure, outpt_prec) 
         PeR = (PrecisionRatio)
-        fwriter.writerow([TraverseLine, Traverse_out, OriginalAngles, NewAngles, Bearings_out, Azimuths_out, Latitudes_out, Departures_out, AOM_out, total_dep, total_lat, Perimeter,ErroC, PeR]) 
+        fwriter.writerow([TraverseLine, Traverse_out, OriginalAngles, NewAngles, Bearings_out, Azimuths_out, Latitudes_out, Departures_out, AOM_out, total_lat, total_dep, Perimeter,ErroC, PeR]) 
     else:
         fwriter.writerow([TraverseLine, Traverse_out, OriginalAngles, NewAngles, Bearings_out, Azimuths_out, Latitudes_out, Departures_out])       
 
