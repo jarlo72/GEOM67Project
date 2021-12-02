@@ -62,8 +62,6 @@ def DMStoDD(DMSangle):
 
     return dd
 
-print(DMStoDD(dms))
-
 # 3) Azimuth Bearing Finder Function, returns azimuth in decimal degrees
 
 def azmcalc(CalcDir, BearingBefore, intAngle):
@@ -146,31 +144,42 @@ def PR(EoC,Perimeter):
 
 # 3. MAIN FUNCTION ####################################################################
 
-# 3.0 PROGRAM STATEMENTS
+# 3.0 PROGRAM STATEMENTS ----------------------------------------------------
 
 print ("This program provides a proposed solution for Closed Traverse data processing, which serves to automate the calculation\n processes a surveyoror drafter would normally perform after the surveying" )
 print ("Insert assumptions and simplifications/Instructions for the user (Disclaimer)")
 
-# 3.1 INPUT LOOP 
+# 3.1 INPUT LOOP ------------------------------------------------------------
 
-Angles_IN =  []       	           # create empty list for receiver angles
-Distances_IN = []                      # create empty list for distance to GZ
+int_angles_list =  []  # create empty list for internal angles
+trav_len_list = []   # create empty list for traverse lengths
 
-    # Obtain angle and distance for multiple locations from the user
-    
-Count = 1
+# Non Looping inputs
+degformat = input("Are your internal angles in DMS or decimal degrees format? Please Enter 'DMS' or 'DD': ")
+outpt_prec = int(input("How precise do you want your non-angular outputs to be? Enter number of digits after decimal point: "))   
+ref_bearing = input("What is your reference bearing from station 1 to 2? Enter format as [N00d00'00\"]: ")
+dir_trav = input("What is the direction of your traverse? Enter 'CC' for counterclockwise or 'C' for clockwise: ")
 
-while True:
-    angle_degrees = float(input("\tEnter the angle of the reciever in degrees: "))
-    Angles_IN.append(angle_degrees)
+# Pre-processing inputs for main processing loop
+ddref_bearing=RefBToAzmDD(ref_bearing) # Calls conversion function to turn reference bearing string w/ directions into decimal degree azimuth
+
+StationCount = 1
+perimeter = 0
+
+while True: # Input loop for internal angles and traverse lengths, with some pre-processing calculations
+
     # Ask the user for the Internal Angle of the current station they are evaluating
-    Internal_Angles = float(input("Please enter the internal angle for the current station: "))
+    Internal_Angles = input("Please enter the internal angle for observed at station "+str(StationCount)+": ")
+    if degformat.upper() == "DMS":
+        int_angle=DMStoDD(Internal_Angles) # converts dms internal angle into dd before appending
+    else:
+        int_angle=float(Internal_Angles) # converts to float
+    int_angles_list.append(int_angle) # appends internal angles in dd format into list
+
     # Ask the user for the Traverse lengths of the current station they are evaluating
-    Traverse_Lengths = float(input("Please enter the Traverse length for the current station: "))
-
-
-    Distance_GZ_CALC =round(CalculateDistance(GZ_X,GZ_Y,R_X,R_Y),1)
-    Distances_IN.append(Distance_GZ_CALC)
+    Traverse_Lengths = float(input("Please enter the length for Traverse going from station "+str(StationCount)+" to "+str(StationCount+1)+": "))
+    trav_len_list.append(Traverse_Lengths) # appends traverse length into format into list
+    perimeter = perimeter + Traverse_Lengths # running total for perimeter
 
     print()
     end =str(input("Do you want to stop enetering values (Y/N)? "))
@@ -178,12 +187,15 @@ while True:
     if end.upper() == 'Y' :
         break
 
-    Count = Count +1
+    StationCount = StationCount + 1
 
-# 3.2 MAIN PROCESSING LOOPS
+# 3.2 MAIN PROCESSING LOOPS -----------------------------------------------------------
+
+# i. Internal Angle conversion
 
 # i. Angle of Misclosure and Balancing -----------------
 
+AoM(StationCount, )
 
 # Function to Calculate the angle of misclosure
 
@@ -207,28 +219,28 @@ Total_Theor =
 
 # 3.3  OUTPUT LOOP 
 
-    degree_sign= u'\N{DEGREE SIGN}' # for output degree symbol
+degree_sign= u'\N{DEGREE SIGN}' # for output degree symbol
 
-    # Display angles, distances, depths from lists in table format
-    fo = open("CalcDepth.csv", 'w', newline='')
-    fwriter = csv.writer(fo)
-    fwriter.writerow(["ID","GZ_X", "GZ_Y", "R_X", "R_Y","Angle_degrees", "DistanceToGZ_m", "CaveDepth_m"]) # Writing header into csv
-    idcount = 0
-    for index in range(len(calc_depths)): # index should be 0, 1, 2, ... to last index in lists
-        
-        idcount = idcount + 1 # unique identifier
-        # writing out inputs into csv
-        gzx_out = gzx_input[index] 
-        gzy_out = gzy_input[index]
-        rx_out = rx_input[index]
-        ry_out = ry_input[index]
-        input_ang_output = input_angles[index] 
-        
-        # writing out calculated values into csv
-        DistToGZ = round(input_distances[index],1) # round the input_dist output display to 1 decimal place
-        caveDepth = round(calc_depths[index],1)  # round the depth output to 1 decimal place
+# Display angles, distances, depths from lists in table format
+fo = open("CalcDepth.csv", 'w', newline='')
+fwriter = csv.writer(fo)
+fwriter.writerow(["ID","GZ_X", "GZ_Y", "R_X", "R_Y","Angle_degrees", "DistanceToGZ_m", "CaveDepth_m"]) # Writing header into csv
+idcount = 0
+for index in range(len(calc_depths)): # index should be 0, 1, 2, ... to last index in lists
+    
+    idcount = idcount + 1 # unique identifier
+    # writing out inputs into csv
+    gzx_out = gzx_input[index] 
+    gzy_out = gzy_input[index]
+    rx_out = rx_input[index]
+    ry_out = ry_input[index]
+    input_ang_output = input_angles[index] 
+    
+    # writing out calculated values into csv
+    DistToGZ = round(input_distances[index],1) # round the input_dist output display to 1 decimal place
+    caveDepth = round(calc_depths[index],1)  # round the depth output to 1 decimal place
 
-        fwriter.writerow([idcount, gzx_out,gzy_out,rx_out,ry_out,input_ang_output,DistToGZ,caveDepth]) # Writing to csv         
+    fwriter.writerow([idcount, gzx_out,gzy_out,rx_out,ry_out,input_ang_output,DistToGZ,caveDepth]) # Writing to csv         
 
-    fo.close()
-    print("Results successfully exported to csv file")
+fo.close()
+print("Results successfully exported to csv file")
