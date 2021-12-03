@@ -165,12 +165,21 @@ trav_len_list = []   # create empty list for traverse lengths
 
 # Non Looping inputs. User enters these only once
 degformat = input("Are your internal angles in DMS or decimal degrees format? Please Enter 'DMS' or 'DD': ")
+print()
 unit_pref = input("Specify the units for your traverse lengths. Please enter 'ft' or 'm': ")
+print()
 outpt_prec = int(input("How precise do you want your non-angular outputs to be? Enter number of digits after decimal point: "))   
-ref_bearing = input("What is your reference bearing from station 1 to 2? Enter format as [N00d00'00\"W]: ")
+print()
+ref_bearing = input("What is your reference Bearing or Azimuth from station 1 to 2?\nEnter format as [N00d00'00\"W] for Bearing or [000d00'00\"]: for Azimuth: ")
+print()
 dir_trav = input("What is the direction of your traverse? Enter 'CC' for counterclockwise or 'C' for clockwise: ")
 print()
-ddref_bearing=RefBToAzmDD(ref_bearing) # Calls conversion function to turn reference bearing string w/ directions into decimal degree azimuth
+
+
+if ref_bearing.find("N") or ref_bearing.find("S") == -1:
+    ddref_bearing=DMStoDD(ref_bearing) # Calls conversion function to turn reference azimuth string into decimal degree azimuth
+else:        
+    ddref_bearing=RefBToAzmDD(ref_bearing) # Calls conversion function to turn reference bearing string w/ directions into decimal degree azimuth
 
 #initiating screen for turtle to draw survey diagram
 wn=turtle.Screen()
@@ -208,7 +217,6 @@ for row in freader: # Input loop for internal angles and traverse lengths, with 
         trav_len_list.append(Traverse_Lengths) # appends traverse length into format into list
         perimeter = perimeter + Traverse_Lengths # running total for perimeter
 
-
         #Turtle named Bharat will draw traverse lines for each iteration of the loop
         if rowcount == 1:
             bharat.left(90-ddref_bearing)
@@ -244,11 +252,11 @@ elif AngleOfMisc== 0:
 # ii. Bearings and Azimuths, Latitudes, Departures ------------------------------------------------ 
 
 Brng_list = [ref_bearing] # assigning the string DMS ref bearing from input to index 0
-azimuth_list = [ddref_bearing] # assigning the convert ref bearing to index 0
-Lat_list = []
-Dep_list = []
-total_lat = 0
-total_dep = 0
+azimuth_list = [ddref_bearing] # assigning the converted ref bearing to index 0
+Lat_list = [] # creating empty list which latitudes will be appended to
+Dep_list = [] # creating empty list which departures will be appended to
+total_lat = 0 # starting running total count for total / change in latitude
+total_dep = 0 # starting running total count for total / change in departure
 
 for index in range(len(int_angles_list)):
     intAngle = int_angles_list[index]
@@ -276,12 +284,15 @@ PrecisionRatio = PR(ErrorOfClosure, perimeter)
 
 # 3.3  OUTPUT LOOP 
 
-# Display angles, distances, depths from lists in table format
-fo = open("Closed_Traverse_Survey.csv", 'w', newline='')
+# Writing all the outputs into a CSV
+fo = open("Closed_Traverse_Survey.csv", 'w', newline='') # Opens an output csv file. Removes the added space between lines
 fwriter = csv.writer(fo)
-fwriter.writerow(["Traverse","Traverse Lengths ("+unit_pref+")", "Original Angles", "Balanced Angles","Bearings", "Azimuths","Latitude ("+unit_pref+")","Departure ("+unit_pref+")","Angle of Misclosure","Total Latitude Change ("+unit_pref+")", "Total Departure Change ("+unit_pref+")","Perimeter ("+unit_pref+")", "Error Of Closure ("+unit_pref+")", "Precision Ratio"]) # Writing header into csv
-idcount = 1
+fwriter.writerow(["Traverse(Current-To-Next Station)","Traverse Lengths ("+unit_pref+")", "Original Internal Angles at Current", "Balanced Internal Angles at Current",
+    "Bearings", "Azimuths","Latitude ("+unit_pref+")","Departure ("+unit_pref+")","Angle of Misclosure","Total Latitude Change ("+unit_pref+")", "Total Departure Change ("+unit_pref+")",
+    "Perimeter ("+unit_pref+")", "Error Of Closure ("+unit_pref+")", "Precision Ratio"]) # Writing the output headers into csv with a unique ID
 
+# Starting Output Loop
+idcount = 1
 for index in range(len(trav_len_list)): # index should be 0, 1, 2, ... to last index in lists
     
     # writing out inputs into csv
