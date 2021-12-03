@@ -1,0 +1,5 @@
+Traverse,Traverse Lengths (ft),Original Angles,Balanced Angles,Bearings,Azimuths,Latitude (ft),Departure (ft),Angular Miscolsure,Total Latitude Change (ft),Total Departure Change (ft),Perimeter (ft),Error Of Closure,Precision Ratio
+1 to 2,713.93,"51d23'00""","51d23'00""","N64d40'00""E","64d40'00""",305.479,645.274,"0d00'00""",0.337,-0.728,2492.44,0.802,1/3106
+2 to 3,606.06,"105d39'00""","105d39'00""","S40d59'00""E","139d00'60""",-457.515,397.478
+3 to 4,391.27,"78d11'00""","78d11'00""","S60d49'60""W","240d49'60""",-190.686,-341.659
+4 to 1,781.18,"124d47'00""","124d47'00""","N63d57'00""W","296d02'60""",343.059,-701.821
