@@ -150,6 +150,8 @@ def PR(EoC,Perimeter):
     Pratio=(str(int(num2))+"/"+str(int(denom2)))
     return Pratio
 
+# Try: # try starts here
+
 # 3. MAIN FUNCTION ####################################################################
 
 # 3.0 PROGRAM STATEMENTS ---------------------------------------------------------------------------------
@@ -170,7 +172,7 @@ unit_pref = input("Specify the units for your traverse lengths. Please enter 'ft
 print()
 outpt_prec = int(input("How precise do you want your non-angular outputs to be? Enter number of digits after decimal point: "))   
 print()
-ref_bearing = input("What is your reference Bearing or Azimuth from station 1 to 2?\nEnter format as [N00d00'00\"W] for Bearing or [000d00'00\"]: for Azimuth: ")
+ref_bearing = input("What is your reference Bearing or Azimuth from station 1 to 2?\nEnter format as [N00d00'00\"W] for Bearing or [000d00'00\"] for Azimuth: ")
 print()
 dir_trav = input("What is the direction of your traverse? Enter 'CC' for counterclockwise or 'C' for clockwise: ")
 print()
@@ -251,7 +253,7 @@ elif AngleOfMisc== 0:
 
 # ii. Bearings and Azimuths, Latitudes, Departures ------------------------------------------------ 
 
-Brng_list = [ref_bearing] # assigning the string DMS ref bearing from input to index 0
+Brng_list = []
 azimuth_list = [ddref_bearing] # assigning the converted ref bearing to index 0
 Lat_list = [] # creating empty list which latitudes will be appended to
 Dep_list = [] # creating empty list which departures will be appended to
@@ -261,6 +263,7 @@ total_dep = 0 # starting running total count for total / change in departure
 for index in range(len(int_angles_list)):
     intAngle = int_angles_list[index]
     if index == 0:
+        Brng_list.append(ddtoDMS(ddref_bearing))
         BrngNext=ddref_bearing
     elif index >= 1:
         BrngNext = azmcalc(dir_trav, BrngB4, intAngle)
@@ -330,3 +333,5 @@ fo.close()
 print("Results successfully exported to csv file. Click on Turtle Window to close program")
 
 wn.exitonclick() #exit turtle program
+
+# Except statements
