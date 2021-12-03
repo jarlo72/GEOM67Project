@@ -183,53 +183,52 @@ bharat.color("black")
 bharat.pensize(5)
 
 # variable declarations for running totals / increments to be used in the following input loop
-StationCount = 1
+rowcount = 0
 perimeter = 0
 SumOfAngles = 0
 
-while True: # Input loop for internal angles and traverse lengths, with some pre-processing calculations
+# Obtain angle and distance for multiple locations from the user
+fo = open("survey_inputs.csv")
+freader = list(csv.reader(fo))
 
-    # Ask the user for the Internal Angle of the current station they are evaluating
-    if degformat.upper() == "DMS":
-        Internal_Angles = input("Please enter the internal angle for observed at station "+str(StationCount)+" in DMS format [000d00'00\"]")
-        int_angle=DMStoDD(Internal_Angles) # converts dms internal angle into dd before appending
-    else:
-        Internal_Angles = input("Please enter the internal angle for observed at station "+str(StationCount)+" in decimal degrees: ")
-        int_angle=float(Internal_Angles) # converts to float
-    int_angles_list.append(int_angle) # appends internal angles in dd format into list
-    SumOfAngles = SumOfAngles + int_angle
+for row in freader: # Input loop for internal angles and traverse lengths, with some pre-processing calculations
+    if rowcount > 0:
 
-    # Ask the user for the Traverse lengths of the current station they are evaluating
-    Traverse_Lengths = float(input("Please enter the length for Traverse going from station "+str(StationCount)+" to "+str(StationCount+1)+": "))
-    trav_len_list.append(Traverse_Lengths) # appends traverse length into format into list
-    perimeter = perimeter + Traverse_Lengths # running total for perimeter
+        # Ask the user for the Internal Angle of the current station they are evaluating
+        Internal_Angles = (freader[rowcount][0])
+        if degformat.upper() == "DMS":
+            int_angle=DMStoDD(Internal_Angles) # converts dms internal angle into dd before appending
+        else:
+            int_angle=float(Internal_Angles) # converts to float
+        int_angles_list.append(int_angle) # appends internal angles in dd format into list
+        SumOfAngles = SumOfAngles + int_angle
 
-    #Turtle named Bharat will draw traverse lines for each iteration of the loop
-    if StationCount == 1:
-        bharat.left(90-ddref_bearing)
-    elif dir_trav == "CC":
-        bharat.left(180-int_angle)
-    elif dir_trav == "C":
-        bharat.left(-1*(180-int_angle))
-    bharat.forward(Traverse_Lengths)
+        # Ask the user for the Traverse lengths of the current station they are evaluating
+        Traverse_Lengths = float(freader[rowcount][1])
+        trav_len_list.append(Traverse_Lengths) # appends traverse length into format into list
+        perimeter = perimeter + Traverse_Lengths # running total for perimeter
 
-    print()
-    end =str(input("Do you want to stop entering values (Y/N)? "))
-    print()
-    if end.upper() == 'Y' :
-        break
 
-    StationCount = StationCount + 1
+        #Turtle named Bharat will draw traverse lines for each iteration of the loop
+        if rowcount == 1:
+            bharat.left(90-ddref_bearing)
+        elif dir_trav == "CC":
+            bharat.left(180-int_angle)
+        elif dir_trav == "C":
+            bharat.left(-1*(180-int_angle))
+        bharat.forward(Traverse_Lengths)
+
+    rowcount=rowcount+1
 
 # 3.2 MAIN PROCESSING LOOPS --------------------------------------------------------------------------
 
 # i. Angle of Misclosure and Balancing --------------------------------------------------------------
 
-AngleOfMisc = AoM(StationCount, SumOfAngles)
+AngleOfMisc = AoM(len(trav_len_list), SumOfAngles)
 Bal_angle_list = []
 
 if AngleOfMisc != 0:
-    balance_Val = (AngleOfMisc/StationCount)
+    balance_Val = (AngleOfMisc/len(trav_len_list))
     for index in range(len(int_angles_list)):
         if AngleOfMisc > 0:
             Balanced_int_angle = int_angles_list[index] - balance_Val
