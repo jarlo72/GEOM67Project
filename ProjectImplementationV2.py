@@ -1,4 +1,4 @@
-# 1. PROGRAM METADATA ###################################
+# 1. PROGRAM METADATA ##############################################################################################################################################################
 
 # Horizontal Closed Traverse Survey Calculator
 # Created by: Justin Brassard, Bharat Bharat, Jon Marlo Delicano 
@@ -9,15 +9,14 @@
 # Inputs entered with keyboard
 # Outputs displayed on screen and exported to csv
 
-# Structure of implementation follows the algorithm
-
-# 2. FUNCTION DEFINITIONS AND IMPORTS #################################################
+# 2. FUNCTION DEFINITIONS AND RELEVENT LIBRARY IMPORTS ##############################################################################################################################
 
 import math # importing math for trig and relevant math functions
 import turtle # importing turtles for drawing a sketch of survey
 import csv # importing csv to read inputs and write outputs
 
-def RefBToAzmDD(bearingStr): # 1) Function to convert Reference Bearing in string-directional-DMS format to an azimuth in decimal degrees for calculation processes
+# 1) Function to convert Reference Bearing in string-directional-DMS format to an azimuth in decimal degrees for calculation processes-----------------------------
+def RefBToAzmDD(bearingStr): 
 
     # checks bearing's vertical direction and assigns the string designation
     if bearingStr[0].upper()=="N":
@@ -48,7 +47,8 @@ def RefBToAzmDD(bearingStr): # 1) Function to convert Reference Bearing in strin
 
     return AZMdd # returns an azimuth as decimal degrees float
 
-def DMStoDD(DMSangle): # 2) DMS to decimal degrees conversion function, for any angles if specified input format is DMS
+# 2) DMS to decimal degrees conversion function, for any angles if specified input format is DMS ------------------------------------------------------------------------
+def DMStoDD(DMSangle):
 
     # Extracts the DMS values from bearing string, reading from the right to account for flexibility in # of digit entered the degrees portion of angle
     num3=(float(DMSangle[-3:-1])) # extracts seconds
@@ -58,7 +58,8 @@ def DMStoDD(DMSangle): # 2) DMS to decimal degrees conversion function, for any 
 
     return dd # returns the internal angle as decimal decimal degree float
 
-def azmcalc(CalcDir, BearingBefore, intAngle): # 3) Azimuth Bearing Finder Function, returns azimuth in decimal degrees
+# 3) Azimuth Bearing Finder Function, returns azimuth in decimal degrees ----------------------------------------------------------------------------------------------------
+def azmcalc(CalcDir, BearingBefore, intAngle): 
 
     # Different formula to find angle depending on user specified direction of travel
     if CalcDir.upper() == "CC": # for a counter clockwise traverse 
@@ -74,8 +75,7 @@ def azmcalc(CalcDir, BearingBefore, intAngle): # 3) Azimuth Bearing Finder Funct
 
     return BearingNext # returns the azimuth bearing for the next traverse, in decimal degrees
 
-# 4) Function to convert Azimuth in decimal degrees to Bearing in DMS; returns string in DMS format
-
+# 4) Function to convert Azimuth in decimal degrees to Bearing in DMS; returns string in DMS format --------------------------------------------------------------------------
 def ddtoDMS(dd):
 
     if dd >= 0 and dd < 90:
@@ -104,8 +104,7 @@ def ddtoDMS(dd):
 
     return bearing
 
-# 5) Converts DD to DMS for any angle which doesn't require directions, such as internal angles and angle of misclosure
-
+# 5) Converts DD to DMS for any angle which doesn't require directions, such as internal angles and angle of misclosure------------------------------------------------------------
 def ddtoDMS2(dd):
     min,sec_ = divmod(dd*3600,60)
     deg,min = divmod(min, 60)
@@ -113,34 +112,29 @@ def ddtoDMS2(dd):
     bearing = str(int(deg))+"d"+"{:02d}".format(int(min))+"'"+"{:02d}".format(sec)+"\""
     return bearing
 
-# 6) Latitude function
-
+# 6) Latitude function--------------------------------------------------------------------------------------------------------------------------------------------------------------
 def LatCalc(azmth, travL):
     azmth_rad = math.radians(azmth)
     changeLat=math.cos(azmth_rad)*travL
     return changeLat
 
-# 7) Departure function
-
+# 7) Departure function--------------------------------------------------------------------------------------------------------------------------------------------------------------
 def DepCalc(azmth, travL):
     azmth_rad = math.radians(azmth)
     changeDep=math.sin(azmth_rad)*travL
     return changeDep
 
-# 8) function to define the angle of miscolsure using the sum of the angles and the sides stated
-
+# 8) function to define the angle of miscolsure using the sum of the angles and the sides stated --------------------------------------------------------------------------------
 def AoM(sides,sum_angles):
     AngMisc = (sides - 2) * 180 - sum_angles
     return AngMisc
 
-# 9) function to find the error of closure
-
+# 9) function to find the error of closure --------------------------------------------------------------------------------------------------------------------------------------------
 def EoC(Total_Lat, Total_Dep):
     ErrClosr = math.sqrt(Total_Lat**2 +Total_Dep**2)
     return ErrClosr
 
-# 10) function to find the Precision Ratio
-
+# 10) function to find the Precision Ratio --------------------------------------------------------------------------------------------------------------------------------------------
 def PR(EoC,Perimeter):
     num,denom = (EoC/Perimeter).as_integer_ratio()
     num2,denom2=(num/num,denom/num)
@@ -149,18 +143,18 @@ def PR(EoC,Perimeter):
 
 # Try: # try starts here
 
-# 3. MAIN FUNCTION ####################################################################
+# 3. MAIN FUNCTION STARTS HERE ############################################################################################################################################################
 
-# 3.0 PROGRAM STATEMENTS ---------------------------------------------------------------------------------
+# 3.0 PROGRAM STATEMENTS ----------------------------------------------------------------------------------------------------------------------------
 
-print ("This program provides a proposed solution for Closed Traverse data processing, which serves to automate the calculation\nprocesses a surveyoror drafter would normally perform after the surveying" )
+print ("This program provides a proposed solution for Closed Traverse data processing, which serves to automate the calculation\nprocesses a surveyor")
+print ("would normally perform after the surveying" )
 print ("Insert assumptions and simplifications/Instructions for the user (Disclaimer)")
 print()
 
-# 3.1 INPUT LOOP AND PRE-PROCESSING ------------------------------------------------------------
+# 3.1 USER INPUT AND VARIOUS PRE-PROCESSING -------------------------------------------------------------------------------------------------------
 
-int_angles_list =  []  # create empty list for internal angles
-trav_len_list = []   # create empty list for traverse lengths
+#i. One time inputs and processing ---------------------------------------------------------------------------------------------------------------
 
 # Non Looping inputs. User enters these only once.
 degformat = input("Are your internal angles in DMS or decimal degrees format? Please Enter 'DMS' or 'DD': ")
@@ -189,7 +183,11 @@ bharat=turtle.Turtle()
 bharat.color("black")
 bharat.pensize(2)
 
-# variable declarations for running totals / increments to be used in the following input loop
+# ii. Input Loop ---------------------------------------------------------------------------------------------------------------------------------------
+
+# list declaration for appending successive user inputs and variable declarations for running totals / increments to be used in the following input loop
+int_angles_list =  []  # create empty list for internal angles
+trav_len_list = []   # create empty list for traverse lengths
 rowcount = 0 # for reading csv
 perimeter = 0 # for perimeter running total
 SumOfAngles = 0 # Running total for actual angles, to be used for Angle of Misclosure
@@ -216,40 +214,37 @@ for row in freader: # Input loop for internal angles and traverse lengths, with 
         trav_len_list.append(Traverse_Lengths) # appends traverse length into format into list
         perimeter = perimeter + Traverse_Lengths # running total for perimeter
 
-        #Turtle named Bharat will draw traverse lines for each iteration of the loop
+        #Turtle named Bharat will draw traverse lines for each iteration of the loop. Algorithm depends on direction of travel
         if rowcount == 1: 
-            bharat.left(90-ddref_bearing)
+            bharat.left(90-ddref_bearing) # sets direction of first traverse using input ref bearing
         elif dir_trav.upper() == "CC":
             bharat.left(180-int_angle)
         elif dir_trav.upper() == "C":
             bharat.left(-1*(180-int_angle))
         bharat.forward(Traverse_Lengths)
-        print("Drawing traverse ", rowcount, "...")
+        print("Drawing traverse line from station", rowcount, "...")
 
-    rowcount=rowcount+1
+    rowcount=rowcount+1 # increments row count before looping again
 
-# 3.2 MAIN PROCESSING LOOPS --------------------------------------------------------------------------
+# 3.2 MAIN PROCESSING LOOPS ----------------------------------------------------------------------------------------------------------------------------------------
 
-# i. Angle of Misclosure and Balancing --------------------------------------------------------------
+# i. Angle of Misclosure and Balancing -----------------------------------------------------------------------------------------------------------------------------
 
-AngleOfMisc = AoM(len(trav_len_list), SumOfAngles)
-Bal_angle_list = []
+AngleOfMisc = AoM(len(trav_len_list), SumOfAngles) # Calls function to calculate angle of misclosure
+Bal_angle_list = [] # Creates empty list for the new or balanced internal angles to be appended in the loop below
+balance_Val = (AngleOfMisc/len(int_angles_list)) # Balancing value determined by dividing angle of misclosure by number of internal angles
 
-if AngleOfMisc != 0:
-    balance_Val = (AngleOfMisc/len(trav_len_list))
-    for index in range(len(int_angles_list)):
-        if AngleOfMisc > 0:
-            Balanced_int_angle = int_angles_list[index] - balance_Val
-            Bal_angle_list.append(Balanced_int_angle)
-        elif AngleOfMisc < 0:
-            Balanced_int_angle = int_angles_list[index] + balance_Val
-            Bal_angle_list.append(Balanced_int_angle)
-elif AngleOfMisc== 0:
-    for index in range(len(int_angles_list)):
-        Balanced_int_angle = int_angles_list[index]
-        Bal_angle_list.append(Balanced_int_angle)
+for index in range(len(int_angles_list)):
+    if AngleOfMisc > 0: # If angle of misclosure is positive, we must subtract the balancing value from each internal angle to balance and append it into the new balanced angle list
+        Balanced_int_angle = int_angles_list[index] - balance_Val
+    elif AngleOfMisc < 0: # If angle of misclosure is negative, we must add the balancing value from each internal angle to balance, and append it into the new balanced angle list
+        Balanced_int_angle = int_angles_list[index] + balance_Val
+    elif AngleOfMisc== 0: # if angle of misclosure is 0, no need to balance angles but is re-appended to new list for convenience in subsequent processes
+            Balanced_int_angle = int_angles_list[index]
 
-# ii. Bearings and Azimuths, Latitudes, Departures ------------------------------------------------ 
+    Bal_angle_list.append(Balanced_int_angle) # appends balanced or original internal into a new list
+
+# ii. Bearings and Azimuths, Latitudes, Departures ------------------------------------------------------------------------------------------------------------------- 
 
 Brng_list = []
 azimuth_list = [ddref_bearing] # assigning the converted ref bearing to index 0
