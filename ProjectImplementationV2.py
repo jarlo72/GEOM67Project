@@ -7,37 +7,36 @@
 # Program function: 
 # Assumes:
 # Inputs entered with keyboard
-# Outputs displayed on screen
+# Outputs displayed on screen and exported to csv
 
 # Structure of implementation follows the algorithm
 
 # 2. FUNCTION DEFINITIONS AND IMPORTS #################################################
 
 import math # importing math for trig and relevant math functions
-import turtle
-import csv
+import turtle # importing turtles for drawing a sketch of survey
+import csv # importing csv to read inputs and write outputs
 
-# 1) Function to convert String Reference Bearing in DMS to azimuth in decimal degrees.
+def RefBToAzmDD(bearingStr): # 1) Function to convert Reference Bearing in string-directional-DMS format to an azimuth in decimal degrees for calculation processes
 
-def RefBToAzmDD(bearingStr):
-
+    # checks bearing's vertical direction and assigns the string designation
     if bearingStr[0].upper()=="N":
             VertDir = "N"
     elif bearingStr[0].upper()=="S":
             VertDir = "S"
 
+    # checks bearing's horizontal direction and assigns the string designation
     if bearingStr[-1].upper()=="W":
             HorDir = "W"
     elif bearingStr[-1].upper()=="E":
             HorDir = "E"
 
-    # Extracts the DMS values from bearing string
+    # Extracts the DMS values from bearing string, reading from the left
     num1=float(bearingStr[1:3]) # extracts degrees
     num2=float(bearingStr[4:6]) # extracts minutes
     num3=float(bearingStr[7:9]) # extracts seconds
-    # print(num1, num2, num3)
 
-    # Selection structure to allocate quadrant azimuth is in.
+    # Selection structure to allocate which quadrant the bearing is in to assign appropriate azimuth calculation
     if (VertDir == "N") and (HorDir == "W"):
             AZMdd=360-(num1+(num2+(num3/60))/60)
     elif (VertDir == "N") and (HorDir == "E"):
@@ -47,35 +46,33 @@ def RefBToAzmDD(bearingStr):
     elif (VertDir == "S") and (HorDir == "E"):
             AZMdd=180-(num1+(num2+(num3/60))/60)
 
-    return AZMdd
+    return AZMdd # returns an azimuth as decimal degrees float
 
-# 2) DMStoDD function, for internal angles if specified input format is DMS
+def DMStoDD(DMSangle): # 2) DMS to decimal degrees conversion function, for any angles if specified input format is DMS
 
-def DMStoDD(DMSangle):
-
+    # Extracts the DMS values from bearing string, reading from the right to account for flexibility in # of digit entered the degrees portion of angle
     num3=(float(DMSangle[-3:-1])) # extracts seconds
     num2=(float(DMSangle[-6:-4])) # extracts minutes
     num1=(float(DMSangle[:-7])) # extracts degree
-    dd=(num1+(num2+(num3/60))/60)
+    dd=(num1+(num2+(num3/60))/60) # calculating decimal degrees from DMS portions.
 
-    return dd
+    return dd # returns the internal angle as decimal decimal degree float
 
-# 3) Azimuth Bearing Finder Function, returns azimuth in decimal degrees
-
-def azmcalc(CalcDir, BearingBefore, intAngle):
+def azmcalc(CalcDir, BearingBefore, intAngle): # 3) Azimuth Bearing Finder Function, returns azimuth in decimal degrees
 
     # Different formula to find angle depending on user specified direction of travel
-    if CalcDir == "CC":
+    if CalcDir.upper() == "CC": # for a counter clockwise traverse 
             BearingNext = BearingBefore - (180 - intAngle)
-    elif CalcDir == "C":
+    elif CalcDir.upper() == "C": # for a counter clockwise traverse 
             BearingNext = BearingBefore + (180 - intAngle)
 
+    # Assigns angle between 0 - 360 degrees if dd azimuth bearing surpasses this limit
     if BearingNext > 360:
             BearingNext = BearingNext - 360
     elif BearingNext < 0:
             BearingNext = BearingNext + 360
 
-    return BearingNext
+    return BearingNext # returns the azimuth bearing for the next traverse, in decimal degrees
 
 # 4) Function to convert Azimuth in decimal degrees to Bearing in DMS; returns string in DMS format
 
@@ -156,7 +153,7 @@ def PR(EoC,Perimeter):
 
 # 3.0 PROGRAM STATEMENTS ---------------------------------------------------------------------------------
 
-print ("This program provides a proposed solution for Closed Traverse data processing, which serves to automate the calculation\n processes a surveyoror drafter would normally perform after the surveying" )
+print ("This program provides a proposed solution for Closed Traverse data processing, which serves to automate the calculation\nprocesses a surveyoror drafter would normally perform after the surveying" )
 print ("Insert assumptions and simplifications/Instructions for the user (Disclaimer)")
 print()
 
@@ -165,7 +162,7 @@ print()
 int_angles_list =  []  # create empty list for internal angles
 trav_len_list = []   # create empty list for traverse lengths
 
-# Non Looping inputs. User enters these only once
+# Non Looping inputs. User enters these only once.
 degformat = input("Are your internal angles in DMS or decimal degrees format? Please Enter 'DMS' or 'DD': ")
 print()
 unit_pref = input("Specify the units for your traverse lengths. Please enter 'ft' or 'm': ")
@@ -177,8 +174,7 @@ print()
 dir_trav = input("What is the direction of your traverse? Enter 'CC' for counterclockwise or 'C' for clockwise: ")
 print()
 
-
-if ref_bearing.find("N") or ref_bearing.find("S") == -1:
+if ref_bearing.find("N") == -1 and ref_bearing.find("S") == -1:
     ddref_bearing=DMStoDD(ref_bearing) # Calls conversion function to turn reference azimuth string into decimal degree azimuth
 else:        
     ddref_bearing=RefBToAzmDD(ref_bearing) # Calls conversion function to turn reference bearing string w/ directions into decimal degree azimuth
@@ -186,33 +182,34 @@ else:
 #initiating screen for turtle to draw survey diagram
 wn=turtle.Screen()
 wn.bgcolor("white")
-height = 5000
-width = 5000
+height = 5000 # screen size height is 5000 to be conservative
+width = 5000 # screen size width is 5000 to be conservative
 turtle.screensize(width, height)
 bharat=turtle.Turtle()
 bharat.color("black")
-bharat.pensize(5)
+bharat.pensize(2)
 
 # variable declarations for running totals / increments to be used in the following input loop
-rowcount = 0
-perimeter = 0
-SumOfAngles = 0
+rowcount = 0 # for reading csv
+perimeter = 0 # for perimeter running total
+SumOfAngles = 0 # Running total for actual angles, to be used for Angle of Misclosure
 
-# Obtain angle and distance for multiple locations from the user
-fo = open("survey_inputs.csv")
+# Obtain internal angles and traverse lengths from an external csv in the same directory
+fo = open("survey_inputs.csv") # opens a csv that must be called this name
 freader = list(csv.reader(fo))
 
 for row in freader: # Input loop for internal angles and traverse lengths, with some pre-processing calculations
-    if rowcount > 0:
+    if rowcount > 0: # To skip the header title
 
         # Ask the user for the Internal Angle of the current station they are evaluating
-        Internal_Angles = (freader[rowcount][0])
-        if degformat.upper() == "DMS":
-            int_angle=DMStoDD(Internal_Angles) # converts dms internal angle into dd before appending
+        Internal_Angles = (freader[rowcount][0]) # Reading value at current row and first column, which should be internal angles
+
+        if degformat.upper() == "DMS": # If degree format is specified as DMS for degree minutes seconds, then we need to convert it to decimal degrees float
+            int_angle=DMStoDD(Internal_Angles) # calls function to convert DMS internal angle into dd before appending
         else:
-            int_angle=float(Internal_Angles) # converts to float
+            int_angle=float(Internal_Angles) # already in decimal degrees, only converts to float
         int_angles_list.append(int_angle) # appends internal angles in dd format into list
-        SumOfAngles = SumOfAngles + int_angle
+        SumOfAngles = SumOfAngles + int_angle # running total
 
         # Ask the user for the Traverse lengths of the current station they are evaluating
         Traverse_Lengths = float(freader[rowcount][1])
@@ -220,13 +217,14 @@ for row in freader: # Input loop for internal angles and traverse lengths, with 
         perimeter = perimeter + Traverse_Lengths # running total for perimeter
 
         #Turtle named Bharat will draw traverse lines for each iteration of the loop
-        if rowcount == 1:
+        if rowcount == 1: 
             bharat.left(90-ddref_bearing)
-        elif dir_trav == "CC":
+        elif dir_trav.upper() == "CC":
             bharat.left(180-int_angle)
-        elif dir_trav == "C":
+        elif dir_trav.upper() == "C":
             bharat.left(-1*(180-int_angle))
         bharat.forward(Traverse_Lengths)
+        print("Drawing traverse ", rowcount, "...")
 
     rowcount=rowcount+1
 
@@ -330,6 +328,7 @@ for index in range(len(trav_len_list)): # index should be 0, 1, 2, ... to last i
         fwriter.writerow([TraverseLine, Traverse_out, OriginalAngles, NewAngles, Bearings_out, Azimuths_out, Latitudes_out, Departures_out])       
 
 fo.close()
+print()
 print("Results successfully exported to csv file. Click on Turtle Window to close program")
 
 wn.exitonclick() #exit turtle program
