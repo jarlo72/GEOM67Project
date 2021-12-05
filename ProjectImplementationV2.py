@@ -183,7 +183,7 @@ bharat=turtle.Turtle()
 bharat.color("black")
 bharat.pensize(2)
 
-# ii. Input Loop ---------------------------------------------------------------------------------------------------------------------------------------
+# ii. Input Loop and Traverse Sketch  ---------------------------------------------------------------------------------------------------------------------------------------
 
 # list declaration for appending successive user inputs and variable declarations for running totals / increments to be used in the following input loop
 int_angles_list =  []  # create empty list for internal angles
@@ -246,24 +246,27 @@ for index in range(len(int_angles_list)):
 
 # ii. Bearings and Azimuths, Latitudes, Departures ------------------------------------------------------------------------------------------------------------------- 
 
-Brng_list = []
-azimuth_list = [ddref_bearing] # assigning the converted ref bearing to index 0
+Brng_list = [] # creating empty list for traverse Bearing string in DMS format with directions
+azimuth_list = [] # creating empty list for traverse azimuth strings in DMS format
 Lat_list = [] # creating empty list which latitudes will be appended to
 Dep_list = [] # creating empty list which departures will be appended to
 total_lat = 0 # starting running total count for total / change in latitude
 total_dep = 0 # starting running total count for total / change in departure
 
-for index in range(len(int_angles_list)):
-    intAngle = int_angles_list[index]
-    if index == 0:
-        Brng_list.append(ddtoDMS(ddref_bearing))
-        BrngNext=ddref_bearing
-    elif index >= 1:
-        BrngNext = azmcalc(dir_trav, BrngB4, intAngle)
-        azimuth_list.append(BrngNext)
-        Brng_list.append(ddtoDMS(BrngNext))
+# Loop for determining the bearing, latitude and departure of current traverse, starting with known reference bearing from St. 1 to 2.
+for index in range(len(int_angles_list)): 
+    intAngle = int_angles_list[index] # extracts internal angle (at current station) from original internal angle list, NOT the balanced angle list, as is standard practise
+
+    if index == 0: # If at first traverse, already know reference bearing
+        Brng_list.append(ddtoDMS(ddref_bearing)) # calls function to convert dd azimuth bearing to string dms bearing with directions, and appends to list
+        azimuth_list.append(ddtoDMS2(ddref_bearing)) # calls function to convert dd azimuth bearing to string dms azimuth and appends to list
+        BrngNext=ddref_bearing # assigns this dd bearing as BearingNext variable (intermediary step for consistency, see next steps)
+    elif index >= 1: # If at any subsequent traverse, need to find bearing and append to azimuth and bearing lists
+        BrngNext = azmcalc(dir_trav, BrngB4, intAngle) # calls function to find azimuth given the direction of traverse, previous azimuth and internal angle at current station
+        Brng_list.append(ddtoDMS(BrngNext)) # calls function to convert dd azimuth bearing to string dms bearing with directions, and appends to list
+        azimuth_list.append(ddtoDMS2(BrngNext)) # appends azimuth to list
     
-    BrngB4 = BrngNext
+    BrngB4 = BrngNext # Assigns the found azimuth at current traverse as the previous azimuth to find next traverse during next loop
 
     Latitude=LatCalc(BrngNext, trav_len_list[index])
     total_lat = total_lat + Latitude
@@ -306,7 +309,7 @@ for index in range(len(trav_len_list)): # index should be 0, 1, 2, ... to last i
     NewAngles = ddtoDMS2(Bal_angle_list[index])
 
     Bearings_out = Brng_list[index]
-    Azimuths_out = ddtoDMS2(azimuth_list[index])
+    Azimuths_out = azimuth_list[index]
 
     Latitudes_out = round(Lat_list[index],outpt_prec)
     Departures_out = round(Dep_list[index],outpt_prec)
