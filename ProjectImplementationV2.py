@@ -147,199 +147,226 @@ def PR(EoC,Perimeter): # Precision ratio = Error of closure divided by perimeter
     Pratio=(str(int(num2))+"/"+str(int(denom2))) # Truncates to whole number. Precision ratio deosn't need to be exact, just close.
     return Pratio
 
-# Try: # try starts here
+# try starts here
+try:
 
-# 3. MAIN FUNCTION STARTS HERE ############################################################################################################################################################
+    # 3. MAIN FUNCTION STARTS HERE ############################################################################################################################################################
 
-# 3.0 PROGRAM STATEMENTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # 3.0 PROGRAM STATEMENTS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-print()
-print("WELCOME! This application is a Closed Traverse Survey Calculator, which serves to automate the calculations and processes a surveyor would normally perform after surveying\n")
-print("Given reference bearing, traverse direction, internal angles and traverse lengths, this program calculates the Bearings, Azimuths, Latitudes and Departures of each traverse.")
-print("As well as the Angle of misclosure, change in latitude and departure, Perimeter, Error of closure and Precision Ratio. User can also specify unit preference, precision of")
-print("non-angular outputs and format preferences of angles.\n")
-print("It is assumed the user understand how this program works and how to properly enter the inputs to ensure it functions as intended, as described in the accompanying guide.doc.")
-print("Please begin this application by entering in the following inputs below:\n")
-print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n")
+    print()
+    print("WELCOME! This application is a Closed Traverse Survey Calculator, which serves to automate the calculations and processes a surveyor would normally perform after surveying\n")
+    print("Given reference bearing, traverse direction, internal angles and traverse lengths, this program calculates the Bearings, Azimuths, Latitudes and Departures of each traverse.")
+    print("As well as the Angle of misclosure, change in latitude and departure, Perimeter, Error of closure and Precision Ratio. User can also specify unit preference, precision of")
+    print("non-angular outputs and format preferences of angles.\n")
+    print("It is assumed the user understand how this program works and how to properly enter the inputs to ensure it functions as intended, as described in the accompanying guide.doc.")
+    print("Please begin this application by entering in the following inputs below:\n")
+    print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n")
 
-# 3.1 USER INPUT AND VARIOUS PRE-PROCESSING >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # 3.1 USER INPUT AND VARIOUS PRE-PROCESSING >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-#i. One time user inputs and pre-processing ---------------------------------------------------------------------------------------------------------------
+    #i. One time user inputs and pre-processing ---------------------------------------------------------------------------------------------------------------
 
-# Non Looping inputs. User enters these only once.
-degformat = input("Are your internal angles in DMS or decimal degrees format? Please Enter 'DMS' or 'DD': ")
-print()
-unit_pref = input("Specify the units for your traverse lengths. Please enter 'ft' or 'm': ")
-print()
-outpt_prec = int(input("How precise do you want your non-angular outputs to be? Enter number of digits after decimal point: "))   
-print()
-ref_bearing = input("What is your reference Bearing or Azimuth from station 1 to 2?\nEnter format as [N00d00'00\"W] for Bearing or [000d00'00\"] for Azimuth: ")
-print()
-dir_trav = input("What is the direction of your traverse? Enter 'CC' for counterclockwise or 'C' for clockwise: ")
-print()
+    # Non Looping inputs. User enters these only once.
+    # degformat = input("Are your internal angles in DMS or decimal degrees format? Please Enter 'DMS' or 'DD': ")
+    # print()
+    unit_pref = input("Specify the units for your traverse lengths. Please enter 'ft' or 'm': ")
+    print()
+    outpt_prec = int(input("How precise do you want your non-angular outputs to be? Enter number of digits after decimal point: "))   
+    print()
+    ref_bearing = input("What is your reference Bearing or Azimuth from station 1 to 2?\nEnter format as [N00d00'00\"W] for Bearing or [000d00'00\"] for Azimuth: ")
+    print()
 
-if ref_bearing.find("N") == -1 and ref_bearing.find("S") == -1:
-    ddref_bearing=DMStoDD(ref_bearing) # Calls conversion function to turn reference azimuth string into decimal degree azimuth
-else:        
-    ddref_bearing=RefBToAzmDD(ref_bearing) # Calls conversion function to turn reference bearing string w/ directions into decimal degree azimuth
+    if ref_bearing.upper().find("N") == -1 and ref_bearing.upper().find("S") == -1:
+        ddref_bearing=DMStoDD(ref_bearing) # Calls conversion function to turn reference azimuth string into decimal degree azimuth
+    else:        
+        ddref_bearing=RefBToAzmDD(ref_bearing) # Calls conversion function to turn reference bearing string w/ directions into decimal degree azimuth
 
-#initiating screen for turtle to draw survey diagram
-wn=turtle.Screen()
-wn.bgcolor("white")
-height = 5000 # screen size height is 5000 to be conservative
-width = 5000 # screen size width is 5000 to be conservative
-turtle.screensize(width, height)
-bharat=turtle.Turtle()
-bharat.color("black")
-bharat.pensize(2)
+    dir_trav = input("What is the direction of your traverse? Enter 'CC' for counterclockwise or 'C' for clockwise: ")
+    print()
 
-# ii. Input Loop for CSV read and Traverse Sketch  ---------------------------------------------------------------------------------------------------------------------------------------
+    #initiating screen for turtle to draw survey diagram
+    wn=turtle.Screen()
+    wn.bgcolor("white")
+    height = 5000 # screen size height is 5000 to be conservative
+    width = 5000 # screen size width is 5000 to be conservative
+    turtle.screensize(width, height)
+    bharat=turtle.Turtle()
+    bharat.color("black")
+    bharat.pensize(2)
 
-# list declaration for appending successive user inputs and variable declarations for running totals / increments to be used in the following input loop
-int_angles_list =  []  # create empty list for internal angles
-trav_len_list = []   # create empty list for traverse lengths
-rowcount = 0 # for reading csv
-perimeter = 0 # for perimeter running total
-SumOfAngles = 0 # Running total for actual angles, to be used for Angle of Misclosure
+    # ii. Input Loop for CSV read and Traverse Sketch  ---------------------------------------------------------------------------------------------------------------------------------------
 
-# Obtain internal angles and traverse lengths from an external csv in the same directory
-fo = open("survey_inputs.csv") # opens a csv that must be called this name
-freader = list(csv.reader(fo))
+    # list declaration for appending successive user inputs and variable declarations for running totals / increments to be used in the following input loop
+    int_angles_list =  []  # create empty list for internal angles
+    trav_len_list = []   # create empty list for traverse lengths
+    rowcount = 0 # for reading csv
+    perimeter = 0 # for perimeter running total
+    SumOfAngles = 0 # Running total for actual angles, to be used for Angle of Misclosure
 
-for row in freader: # Input loop for internal angles and traverse lengths, with some pre-processing calculations
-    if rowcount > 0: # To skip the header title
+    # Obtain internal angles and traverse lengths from an external csv in the same directory
+    fo = open("survey_inputs.csv") # opens a csv that must be called this name
+    freader = list(csv.reader(fo))
 
-        # Ask the user for the Internal Angle of the current station they are evaluating
-        Internal_Angles = (freader[rowcount][0]) # Reading value at current row and first column, which should be internal angles
+    for row in freader: # Input loop for internal angles and traverse lengths, with some pre-processing calculations
+        if rowcount > 0: # To skip the header title
 
-        if degformat.upper() == "DMS": # If degree format is specified as DMS for degree minutes seconds, then we need to convert it to decimal degrees float
-            int_angle=DMStoDD(Internal_Angles) # calls function to convert DMS internal angle into dd before appending
-        else:
-            int_angle=float(Internal_Angles) # already in decimal degrees, only converts to float
-        int_angles_list.append(int_angle) # appends internal angles in dd format into list
-        SumOfAngles = SumOfAngles + int_angle # running total
+            # Ask the user for the Internal Angle of the current station they are evaluating
+            Internal_Angles = (freader[rowcount][0]) # Reading value at current row and first column, which should be internal angles
 
-        # Ask the user for the Traverse lengths of the current station they are evaluating
-        Traverse_Lengths = float(freader[rowcount][1])
-        trav_len_list.append(Traverse_Lengths) # appends traverse length into format into list
-        perimeter = perimeter + Traverse_Lengths # running total for perimeter
+            if Internal_Angles.find("d") != -1 and Internal_Angles.find("'") != -1 and Internal_Angles.find("\"") != -1: # If degree format is specified as DMS for degree minutes seconds, then we need to convert it to decimal degrees float
+                    int_angle=DMStoDD(Internal_Angles) # calls function to convert DMS internal angle into dd before appending
+            else:
+                int_angle=float(Internal_Angles) # already in decimal degrees, only converts to float
+            int_angles_list.append(int_angle) # appends internal angles in dd format into list
+            SumOfAngles = SumOfAngles + int_angle # running total
 
-        #Turtle named Bharat will draw traverse lines for each iteration of the loop. Algorithm depends on direction of travel
-        if rowcount == 1: 
-            bharat.left(90-ddref_bearing) # sets direction of first traverse using input ref bearing
-        elif dir_trav.upper() == "CC":
-            bharat.left(180-int_angle)
-        elif dir_trav.upper() == "C":
-            bharat.left(-1*(180-int_angle))
-        bharat.forward(Traverse_Lengths)
-        print("Drawing traverse line from station", rowcount, "...")
+            # Ask the user for the Traverse lengths of the current station they are evaluating
+            Traverse_Lengths = float(freader[rowcount][1])
+            trav_len_list.append(Traverse_Lengths) # appends traverse length into format into list
+            perimeter = perimeter + Traverse_Lengths # running total for perimeter
 
-    rowcount=rowcount+1 # increments row count before looping again
+            #Turtle named Bharat will draw traverse lines for each iteration of the loop. Algorithm depends on direction of travel
+            if rowcount == 1: 
+                bharat.left(90-ddref_bearing) # sets direction of first traverse using input ref bearing
+            elif dir_trav.upper() == "CC":
+                bharat.left(180-int_angle)
+            elif dir_trav.upper() == "C":
+                bharat.left(-1*(180-int_angle))
+            bharat.forward(Traverse_Lengths)
+            print("Drawing traverse line from station", rowcount, "...")
 
-# 3.2 MAIN PROCESSING LOOPS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+        rowcount=rowcount+1 # increments row count before looping again
 
-# i. Angle of Misclosure and Balancing Processing Loop -----------------------------------------------------------------------------------------------------------------------------
+    # 3.2 MAIN PROCESSING LOOPS >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-AngleOfMisc = AoM(len(trav_len_list), SumOfAngles) # Calls function to calculate angle of misclosure
-balance_Val = (AngleOfMisc/len(int_angles_list)) # Balancing value determined by dividing angle of misclosure by number of internal angles
-Bal_angle_list = [] # Creates empty list for the new or balanced internal angles to be appended in the loop below
+    # i. Angle of Misclosure and Balancing Processing Loop -----------------------------------------------------------------------------------------------------------------------------
 
-# Loop for balancing internal angles
-for index in range(len(int_angles_list)):
-    if AngleOfMisc > 0: # If angle of misclosure is positive, we must subtract the balancing value from each internal angle to balance and append it into the new balanced angle list
-        Balanced_int_angle = int_angles_list[index] - balance_Val
-    elif AngleOfMisc < 0: # If angle of misclosure is negative, we must add the balancing value from each internal angle to balance, and append it into the new balanced angle list
-        Balanced_int_angle = int_angles_list[index] + balance_Val
-    elif AngleOfMisc== 0: # if angle of misclosure is 0, no need to balance angles but is re-appended to new list for convenience in subsequent processes
-            Balanced_int_angle = int_angles_list[index]
+    AngleOfMisc = AoM(len(trav_len_list), SumOfAngles) # Calls function to calculate angle of misclosure
+    balance_Val = (AngleOfMisc/len(int_angles_list)) # Balancing value determined by dividing angle of misclosure by number of internal angles
+    Bal_angle_list = [] # Creates empty list for the new or balanced internal angles to be appended in the loop below
 
-    Bal_angle_list.append(Balanced_int_angle) # appends balanced or original internal into a new list
+    # Loop for balancing internal angles
+    for index in range(len(int_angles_list)):
+        if AngleOfMisc > 0: # If angle of misclosure is positive, we must subtract the balancing value from each internal angle to balance and append it into the new balanced angle list
+            Balanced_int_angle = int_angles_list[index] - balance_Val
+        elif AngleOfMisc < 0: # If angle of misclosure is negative, we must add the balancing value from each internal angle to balance, and append it into the new balanced angle list
+            Balanced_int_angle = int_angles_list[index] + balance_Val
+        elif AngleOfMisc== 0: # if angle of misclosure is 0, no need to balance angles but is re-appended to new list for convenience in subsequent processes
+                Balanced_int_angle = int_angles_list[index]
 
-# ii. Bearings and Azimuths, Latitudes, Departures Processing Loop ------------------------------------------------------------------------------------------------------------------- 
+        Bal_angle_list.append(Balanced_int_angle) # appends balanced or original internal into a new list
 
-# variable and list declarations for processing loops
-Brng_list = [] # creating empty list for traverse Bearing string in DMS format with directions
-azimuth_list = [] # creating empty list for traverse azimuth strings in DMS format
-Lat_list = [] # creating empty list which latitudes will be appended to
-Dep_list = [] # creating empty list which departures will be appended to
-total_lat = 0 # starting running total count for total / change in latitude
-total_dep = 0 # starting running total count for total / change in departure
+    # ii. Bearings and Azimuths, Latitudes, Departures Processing Loop ------------------------------------------------------------------------------------------------------------------- 
 
-# Loop for determining the bearing, latitude and departure of current traverse, starting with known reference bearing from St. 1 to 2.
-for index in range(len(int_angles_list)): 
-    intAngle = int_angles_list[index] # extracts internal angle (at current station) from original internal angle list, NOT the balanced angle list, as is standard practise
+    # variable and list declarations for processing loops
+    Brng_list = [] # creating empty list for traverse Bearing string in DMS format with directions
+    azimuth_list = [] # creating empty list for traverse azimuth strings in DMS format
+    Lat_list = [] # creating empty list which latitudes will be appended to
+    Dep_list = [] # creating empty list which departures will be appended to
+    total_lat = 0 # starting running total count for total / change in latitude
+    total_dep = 0 # starting running total count for total / change in departure
 
-    if index == 0: # If at first traverse, already know reference bearing
-        Brng_list.append(ddtoDMS(ddref_bearing)) # calls function to convert dd azimuth bearing to string dms bearing with directions, and appends to list
-        azimuth_list.append(ddtoDMS2(ddref_bearing)) # calls function to convert dd azimuth bearing to string dms azimuth and appends to list
-        BrngNext=ddref_bearing # assigns this dd bearing as BearingNext variable (intermediary step for consistency, see next steps)
-    elif index >= 1: # If at any subsequent traverse, need to find bearing and append to azimuth and bearing lists
-        BrngNext = azmcalc(dir_trav, BrngB4, intAngle) # calls function to find azimuth given the direction of traverse, previous azimuth and internal angle at current station
-        Brng_list.append(ddtoDMS(BrngNext)) # calls function to convert dd azimuth bearing to string dms bearing with directions, and appends to list
-        azimuth_list.append(ddtoDMS2(BrngNext)) # appends azimuth to list
-    
-    BrngB4 = BrngNext # Assigns the found azimuth at current traverse as the previous azimuth to find next traverse during next loop
+    # Loop for determining the bearing, latitude and departure of current traverse, starting with known reference bearing from St. 1 to 2.
+    for index in range(len(int_angles_list)): 
+        intAngle = int_angles_list[index] # extracts internal angle (at current station) from original internal angle list, NOT the balanced angle list, as is standard practise
 
-    Latitude=LatCalc(BrngNext, trav_len_list[index]) # Calls function to find latitude of traverse, given the found azimuth and traverse length
-    total_lat = total_lat + Latitude # running total for latitude to find total change
-    Lat_list.append(Latitude) # Appends to list
+        if index == 0: # If at first traverse, already know reference bearing
+            Brng_list.append(ddtoDMS(ddref_bearing)) # calls function to convert dd azimuth bearing to string dms bearing with directions, and appends to list
+            azimuth_list.append(ddtoDMS2(ddref_bearing)) # calls function to convert dd azimuth bearing to string dms azimuth and appends to list
+            BrngNext=ddref_bearing # assigns this dd bearing as BearingNext variable (intermediary step for consistency, see next steps)
+        elif index >= 1: # If at any subsequent traverse, need to find bearing and append to azimuth and bearing lists
+            BrngNext = azmcalc(dir_trav, BrngB4, intAngle) # calls function to find azimuth given the direction of traverse, previous azimuth and internal angle at current station
+            Brng_list.append(ddtoDMS(BrngNext)) # calls function to convert dd azimuth bearing to string dms bearing with directions, and appends to list
+            azimuth_list.append(ddtoDMS2(BrngNext)) # appends azimuth to list
+        
+        BrngB4 = BrngNext # Assigns the found azimuth at current traverse as the previous azimuth to find next traverse during next loop
 
-    Departure = DepCalc(BrngNext, trav_len_list[index]) # Calls function to find departure of traverse, given the found azimuth and traverse length
-    total_dep = total_dep + Departure # running total for departure to find total change
-    Dep_list.append(Departure) # Appends to list
+        Latitude=LatCalc(BrngNext, trav_len_list[index]) # Calls function to find latitude of traverse, given the found azimuth and traverse length
+        total_lat = total_lat + Latitude # running total for latitude to find total change
+        Lat_list.append(Latitude) # Appends to list
 
-# iii. Error of Closure and Precision Ratio ----------------------------------------------------------------------------------------------------------------------------------------- 
+        Departure = DepCalc(BrngNext, trav_len_list[index]) # Calls function to find departure of traverse, given the found azimuth and traverse length
+        total_dep = total_dep + Departure # running total for departure to find total change
+        Dep_list.append(Departure) # Appends to list
 
-# Calls function to find Error of Closure and Precision Ratio from the outputs found above   
-ErrorOfClosure = EoC(total_lat, total_dep)
-PrecisionRatio = PR(ErrorOfClosure, perimeter)
+    # iii. Error of Closure and Precision Ratio ----------------------------------------------------------------------------------------------------------------------------------------- 
 
-# 3.3  OUTPUT LOOP TO WRITE TO CSV >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+    # Calls function to find Error of Closure and Precision Ratio from the outputs found above   
+    ErrorOfClosure = EoC(total_lat, total_dep)
+    PrecisionRatio = PR(ErrorOfClosure, perimeter)
 
-# i. Opens csv to write all the outputs into a CSV ----------------------------------------------------------------------------------------------------------------------------------
-fo = open("Closed_Traverse_Survey.csv", 'w', newline='') # Opens an output csv file. Removes the added space between lines
-fwriter = csv.writer(fo)
-fwriter.writerow(["Traverse(Current-To-Next Station)","Traverse Lengths ("+unit_pref+")", "Original Internal Angles at Current", "Balanced Internal Angles at Current",
-    "Bearings", "Azimuths","Latitude ("+unit_pref+")","Departure ("+unit_pref+")","Angle of Misclosure","Total Latitude Change ("+unit_pref+")", "Total Departure Change ("+unit_pref+")",
-    "Perimeter ("+unit_pref+")", "Error Of Closure ("+unit_pref+")", "Precision Ratio"]) # Writing the output headers into csv with a unique ID
+    # 3.3  OUTPUT LOOP TO WRITE TO CSV >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 
-# ii. Starting Output Loop ----------------------------------------------------------------------------------------------------------------------------------------------------------
-idcount = 1 # for traverse name
-for index in range(len(trav_len_list)): # Writes output values row by row in a loop using traverse length (but could also be angle list as well)
-    
-    # Selection structure to assign traverse name based on current and next station
-    if index == len(trav_len_list)-1: # Assigns traverse name connecting last station to first station, since it loops back
-        TraverseLine = str(idcount)+" to 1"
-    else: # Assigns traverse connecting every other station
-        TraverseLine = str(idcount)+" to "+str(idcount+1)
-    idcount = idcount + 1 # increments for next station
+    # i. Opens csv to write all the outputs into a CSV ----------------------------------------------------------------------------------------------------------------------------------
+    fo = open("Closed_Traverse_Survey.csv", 'w', newline='') # Opens an output csv file. Removes the added space between lines
+    fwriter = csv.writer(fo)
+    fwriter.writerow(["Traverse(Current-To-Next Station)","Traverse Lengths ("+unit_pref+")", "Original Internal Angles at Current", "Balanced Internal Angles at Current",
+        "Bearings", "Azimuths","Latitude ("+unit_pref+")","Departure ("+unit_pref+")","Angle of Misclosure","Total Latitude Change ("+unit_pref+")", "Total Departure Change ("+unit_pref+")",
+        "Perimeter ("+unit_pref+")", "Error Of Closure ("+unit_pref+")", "Precision Ratio"]) # Writing the output headers into csv with a unique ID
 
-    Traverse_out = trav_len_list[index] # Extracts length of traverse line projecting from current station from list
+    # ii. Starting Output Loop ----------------------------------------------------------------------------------------------------------------------------------------------------------
+    idcount = 1 # for traverse name
+    for index in range(len(trav_len_list)): # Writes output values row by row in a loop using traverse length (but could also be angle list as well)
+        
+        # Selection structure to assign traverse name based on current and next station
+        if index == len(trav_len_list)-1: # Assigns traverse name connecting last station to first station, since it loops back
+            TraverseLine = str(idcount)+" to 1"
+        else: # Assigns traverse connecting every other station
+            TraverseLine = str(idcount)+" to "+str(idcount+1)
+        idcount = idcount + 1 # increments for next station
 
-    OriginalAngles = ddtoDMS2(int_angles_list[index]) # extracts original angles at current station from list while calling function to convert to DMS format
-    NewAngles = ddtoDMS2(Bal_angle_list[index]) # extracts new/balanced angles at current station from list while calling function to convert to DMS format
+        Traverse_out = trav_len_list[index] # Extracts length of traverse line projecting from current station from list
 
-    Bearings_out = Brng_list[index] # extracts Bearing of traverse projected from current station from list
-    Azimuths_out = azimuth_list[index] # extracts azimuth of traverse projected from current station from list
+        OriginalAngles = ddtoDMS2(int_angles_list[index]) # extracts original angles at current station from list while calling function to convert to DMS format
+        NewAngles = ddtoDMS2(Bal_angle_list[index]) # extracts new/balanced angles at current station from list while calling function to convert to DMS format
 
-    Latitudes_out = round(Lat_list[index],outpt_prec) # extracts latitude of current traverse from list, rounded to specified precision
-    Departures_out = round(Dep_list[index],outpt_prec) # extracts departure of current traverse from list, rounded to specified precision
+        Bearings_out = Brng_list[index] # extracts Bearing of traverse projected from current station from list
+        Azimuths_out = azimuth_list[index] # extracts azimuth of traverse projected from current station from list
 
-    if index == 0: # Need to write the single value outputs only once, on the first row under headers
-        AOM_out = ddtoDMS2(AngleOfMisc) # variable to write Angle of Misclosure, in DMS format
-        total_dep = round(total_dep,outpt_prec) # variable to write total change in departure
-        total_lat = round(total_lat,outpt_prec) # variable to write total change in latitude
-        Perimeter = round(perimeter,outpt_prec) # variable to write a rounded perimeter
-        ErroC = round(ErrorOfClosure,outpt_prec) # variable to write a rounded Error of closure
-        # precision ratio variable to be written already exists from earlier
-        fwriter.writerow([TraverseLine, Traverse_out, OriginalAngles, NewAngles, Bearings_out, Azimuths_out, Latitudes_out, Departures_out, AOM_out, total_lat, total_dep, Perimeter,ErroC, PrecisionRatio]) 
-    else: # No need to write the single value outputs anymore, just the looped outputs.
-        fwriter.writerow([TraverseLine, Traverse_out, OriginalAngles, NewAngles, Bearings_out, Azimuths_out, Latitudes_out, Departures_out])       
+        Latitudes_out = round(Lat_list[index],outpt_prec) # extracts latitude of current traverse from list, rounded to specified precision
+        Departures_out = round(Dep_list[index],outpt_prec) # extracts departure of current traverse from list, rounded to specified precision
 
-fo.close()
-print()
-print("Results successfully exported to csv file. Click on Turtle Window to close program") # Letting user know the program is successful
+        if index == 0: # Need to write the single value outputs only once, on the first row under headers
+            AOM_out = ddtoDMS2(AngleOfMisc) # variable to write Angle of Misclosure, in DMS format
+            total_dep = round(total_dep,outpt_prec) # variable to write total change in departure
+            total_lat = round(total_lat,outpt_prec) # variable to write total change in latitude
+            Perimeter = round(perimeter,outpt_prec) # variable to write a rounded perimeter
+            ErroC = round(ErrorOfClosure,outpt_prec) # variable to write a rounded Error of closure
+            # precision ratio variable to be written already exists from earlier
+            fwriter.writerow([TraverseLine, Traverse_out, OriginalAngles, NewAngles, Bearings_out, Azimuths_out, Latitudes_out, Departures_out, AOM_out, total_lat, total_dep, Perimeter,ErroC, PrecisionRatio]) 
+        else: # No need to write the single value outputs anymore, just the looped outputs.
+            fwriter.writerow([TraverseLine, Traverse_out, OriginalAngles, NewAngles, Bearings_out, Azimuths_out, Latitudes_out, Departures_out])       
 
-wn.exitonclick() #exits turtle program
+    fo.close()
+    print()
+    print("Results successfully exported to csv file. Click on Turtle Window to close program") # Letting user know the program is successful
 
-# Except statements
+    wn.exitonclick() #exits turtle program
+
+# Except statements and print statements
+except(IndexError): #exception for invalid angle or distance inputs
+    print()
+    print("Invalid input from input CSV file. Please ensure there are no empty rows")
+    print("Please Try Again \n")
+except(ValueError): #exception for invalid angle or distance inputs
+    print()
+    print("Invalid input from input CSV file or python terminal. Please ensure you enter in the data properly in the specified format")
+    print("Please Try Again \n")
+except(PermissionError):
+    print()
+    print("Program can't write output. Please close any instance of the Output CSV file or fle of the same name.")
+    print("Please Try Again \n")
+except(UnboundLocalError):
+    print()
+    print("Please specify direction input as either 'CC' for counterclockwise or 'C' for clockwise EXACTLY")
+    print("Please Try Again \n")
+
+except: #General exception
+    print()
+    print("There is an unknown form of invalidity in your inputs. Program will not continue")
+    print("Please Try Again \n")
+
+else: #if all inputs were valid and user no longer wants to continue, display goodbye
+    print("Goodbye")
+    print()
