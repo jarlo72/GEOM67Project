@@ -74,7 +74,7 @@ def azmcalc(CalcDir, BearingBefore, intAngle):
     # Different formula to find angle depending on user specified direction of travel
     if CalcDir.upper() == "CC": # for a counter clockwise traverse 
             BearingNext = BearingBefore - (180 - intAngle)
-    elif CalcDir.upper() == "C": # for a counter clockwise traverse 
+    elif CalcDir.upper() == "C": # for a clockwise traverse 
             BearingNext = BearingBefore + (180 - intAngle)
 
     # Assigns angle between 0 - 360 degrees if dd azimuth bearing surpasses this limit
@@ -354,7 +354,7 @@ except(ValueError): # exception if there are any discrepancies in the data's for
     print()
     print("Invalid input from input CSV file or python terminal. Please ensure you enter in the data properly in the specified format")
     print("Please Try Again \n")
-except(PermissionError): # exception if csv output file is still open, thus program cannot write out
+except(PermissionError): # exception if csv output file is still open, thus program cannot write output
     print()
     print("Program can't write output. Please close any instance of the Output CSV file or fle of the same name.")
     print("Please Try Again \n")
