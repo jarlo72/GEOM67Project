@@ -17,7 +17,7 @@
     # 7. Reference bearing always in DMS format
     # 8. Input CSV file is in same directory and named exactly "survey_inputs.csv>
 # Inputs entered into python terminal and read from csv file
-# Outputs displayed on screen and exported to csv
+# Outputs displayed on screen as a sketch and exported to csv
 
 # 2. FUNCTION DEFINITIONS AND RELEVENT LIBRARY IMPORTS ##############################################################################################################################
 
@@ -159,6 +159,7 @@ try:
     print("Given reference bearing, traverse direction, internal angles and traverse lengths, this program calculates the Bearings, Azimuths, Latitudes and Departures of each traverse.")
     print("As well as the Angle of misclosure, change in latitude and departure, Perimeter, Error of closure and Precision Ratio. User can also specify unit preference, precision of")
     print("non-angular outputs and format preferences of angles.\n")
+    print("For your reference, a rough sketch of the traverse is drawn. This helps to make sure your survey data makes sense.\n")
     print("It is assumed the user understand how this program works and how to properly enter the inputs to ensure it functions as intended, as described in the accompanying guide.doc.")
     print("Please begin this application by entering in the following inputs below:\n")
     print("----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------\n")
@@ -345,24 +346,27 @@ try:
     wn.exitonclick() #exits turtle program
 
 # Except statements and print statements
-except(IndexError): #exception for invalid angle or distance inputs
+except(IndexError): # exception if there are any empty rows
     print()
     print("Invalid input from input CSV file. Please ensure there are no empty rows")
     print("Please Try Again \n")
-except(ValueError): #exception for invalid angle or distance inputs
+except(ValueError): # exception if there are any discrepancies in the data's format in either the csv or python terminal
     print()
     print("Invalid input from input CSV file or python terminal. Please ensure you enter in the data properly in the specified format")
     print("Please Try Again \n")
-except(PermissionError):
+except(PermissionError): # exception if csv output file is still open, thus program cannot write out
     print()
     print("Program can't write output. Please close any instance of the Output CSV file or fle of the same name.")
     print("Please Try Again \n")
-except(UnboundLocalError):
+except(UnboundLocalError): # exception if directionality is not specified correctly
     print()
     print("Please specify direction input as either 'CC' for counterclockwise or 'C' for clockwise EXACTLY")
     print("Please Try Again \n")
-
-except: #General exception
+except(FileNotFoundError): # exception is input csv file is not named properly or not in the same directory
+    print()
+    print("Program cannot find input csv file. Ensure it is in the SAME directory and named EXACTLY as 'survey_inputs.csv'")
+    print("Please Try Again \n")
+except: #General exception in case there are unknown errors to be discovered
     print()
     print("There is an unknown form of invalidity in your inputs. Program will not continue")
     print("Please Try Again \n")
