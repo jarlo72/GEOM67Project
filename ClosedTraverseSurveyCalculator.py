@@ -15,7 +15,7 @@
     # 5. Reference bearing or azimuth always considered as going from Station 1 to 2
     # 6. Program starts processing from this line
     # 7. Reference bearing always in DMS format
-    # 8. Input CSV file is in same directory and named exactly "survey_inputs.csv>
+    # 8. Input CSV file is in same directory and named exactly "survey_inputs.csv"
 # Inputs entered into python terminal and read from csv file
 # Outputs displayed on screen as a sketch and exported to csv
 
